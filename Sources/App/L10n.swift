@@ -115,7 +115,18 @@ enum Fmt {
         cachedDate = f
         return f
     }
-    static func resetFormatters() { cachedDate = nil }
+    nonisolated(unsafe) private static var cachedDay: DateFormatter?
+    nonisolated(unsafe) private static var cachedTime: DateFormatter?
+    /// Top bar: date (with year) and time on two short lines so long locales (Hebrew, Russian) fit
+    /// beside the one-row icon bar.
+    static func twoLineDate(_ d: Date) -> String {
+        if cachedDay == nil {
+            let f = DateFormatter(); f.locale = AppLanguage.locale; f.dateStyle = .medium; f.timeStyle = .none; cachedDay = f
+            let t = DateFormatter(); t.locale = AppLanguage.locale; t.dateStyle = .none; t.timeStyle = .medium; cachedTime = t
+        }
+        return cachedDay!.string(from: d) + "\n" + cachedTime!.string(from: d)
+    }
+    static func resetFormatters() { cachedDate = nil; cachedDay = nil; cachedTime = nil }
 }
 
 extension View {

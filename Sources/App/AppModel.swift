@@ -176,7 +176,7 @@ final class AppModel: ObservableObject {
     // MARK: Snapshot (main thread, ~4 Hz)
 
     private func snapshot(_ st: EphemerisState) {
-        dateText = Fmt.dateFormatter.string(from: AstroTime.date(julian: st.jd))
+        dateText = Fmt.twoLineDate(AstroTime.date(julian: st.jd))
         isLive = viewer.clock.isLive
         let jd = st.jd
         if jd <= AstroTime.minJD + 1 || jd >= AstroTime.maxJD - 1, rate != 0 { setRate(0) }

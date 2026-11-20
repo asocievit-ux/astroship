@@ -62,10 +62,10 @@ struct TopBar: View {
                         Text(L("time.live")).font(.caption2.weight(.bold)).foregroundStyle(Color.red)
                     }
                 }
-                Text(model.dateText).font(.footnote.monospacedDigit()).foregroundStyle(.white)
-                    .lineLimit(1).minimumScaleFactor(0.7)
+                Text(model.dateText).font(.caption.monospacedDigit()).foregroundStyle(.white)
+                    .lineLimit(2).minimumScaleFactor(0.7).multilineTextAlignment(.leading)
             }
-            .padding(.horizontal, 12).padding(.vertical, 8)
+            .padding(.horizontal, 12).padding(.vertical, 6)
             .glass()
             Spacer(minLength: 4)
             // All top controls in one row (mode switch | settings, galaxy, viewing mode), one glass capsule.
