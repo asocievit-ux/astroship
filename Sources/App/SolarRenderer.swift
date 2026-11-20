@@ -385,7 +385,7 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
         if show {
             if sunTrailNode.geometry == nil {
                 let len = 365.25 * 60 * 86_400
-                let p0 = (v * -len).sceneUnits
+                let p0 = (GalacticMotion.velocityEcliptic * -len).sceneUnits
                 sunTrailNode.geometry = Geo.lineStrip([p0, .zero],
                                                       colors: [SIMD3<Float>(0, 0, 0), SIMD3<Float>(1.0, 0.75, 0.3)], closed: false)
             }
