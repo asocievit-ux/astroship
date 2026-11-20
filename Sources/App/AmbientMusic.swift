@@ -1,8 +1,10 @@
 import AVFoundation
 import Foundation
 
-/// Background music: four Pixabay Content License tracks (Resources/Audio/bgm1-4.m4a, see
-/// docs/licenses.md) played in order as an endless gapless playlist. Plays from launch at a modest volume. Session category .ambient: mixes with other audio and
+/// Background music: every audio file in the bundle's Audio folder (Resources/Audio, licences in
+/// docs/licenses.md) played as an endless gapless playlist in shuffled order, reshuffled each cycle
+/// without repeating a track back-to-back. Adding a track = dropping a 44.1 kHz stereo file in
+/// Resources/Audio (tools/add_bgm.sh re-encodes one). Plays from launch at a modest volume. Session category .ambient: mixes with other audio and
 /// respects the silent switch; the hardware volume buttons set the level. Pauses in the background.
 @MainActor
 final class AmbientMusic {
@@ -10,11 +12,13 @@ final class AmbientMusic {
 
     private let engine = AVAudioEngine()
     private let player = AVAudioPlayerNode()
-    // Streamed from disk (36 minutes in total; far too big to hold decoded). The next track is always
-    // queued behind the playing one, so the playlist is gapless.
-    private var files: [AVAudioFile] = []
-    private var nextFile = 0
-    private var file: AVAudioFile? { files.first }
+    // Streamed from disk (far too long to hold decoded). The next track is always queued behind the
+    // playing one, so the playlist is gapless. Each scheduled pass opens its own reader.
+    private var tracks: [URL] = []
+    private var order: [URL] = []          // remaining tracks of the current shuffled cycle
+    private var lastQueued: URL?
+    private var format: AVAudioFormat?
+    static let audioExtensions: Set<String> = ["m4a", "mp3", "aac", "wav", "caf", "aif", "aiff"]
     private var configured = false
     private var wantsPlay = false
     private let volume: Float = 0.35
@@ -33,15 +37,22 @@ final class AmbientMusic {
     }
 
     private func configure() -> Bool {
-        if configured { return file != nil }
+        if configured { return format != nil }
         configured = true
-        files = Self.playlist.compactMap { name in
-            Bundle.main.url(forResource: name, withExtension: "m4a", subdirectory: "Audio")
-                .flatMap { try? AVAudioFile(forReading: $0) }
+        guard let dir = Bundle.main.resourceURL?.appendingPathComponent("Audio"),
+              let urls = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)
+        else { return false }
+        let candidates = urls.filter { Self.audioExtensions.contains($0.pathExtension.lowercased()) }
+            .sorted { $0.lastPathComponent < $1.lastPathComponent }
+        // The player node runs at one format; keep only tracks that match the first readable one.
+        for url in candidates {
+            guard let f = try? AVAudioFile(forReading: url) else { continue }
+            if format == nil { format = f.processingFormat }
+            if f.processingFormat == format { tracks.append(url) }
         }
-        guard let f = files.first else { return false }
+        guard let fmt = format, !tracks.isEmpty else { return false }
         engine.attach(player)
-        engine.connect(player, to: engine.mainMixerNode, format: f.processingFormat)
+        engine.connect(player, to: engine.mainMixerNode, format: fmt)
         player.volume = volume
         return true
     }
@@ -70,7 +81,7 @@ final class AmbientMusic {
     }
 
     func resumeIfWanted() {
-        guard wantsPlay, configure(), file != nil else { return }
+        guard wantsPlay, configure(), format != nil else { return }
         do {
             let s = AVAudioSession.sharedInstance()
             try s.setCategory(.ambient, mode: .default, options: [.mixWithOthers])
@@ -89,13 +100,10 @@ final class AmbientMusic {
     }
 
     private var scheduled = false
-    private static let playlist = ["bgm1", "bgm2", "bgm3", "bgm4"]
     private var generation = 0
 
     private func scheduleNext() {
-        guard !files.isEmpty else { return }
-        let f = files[nextFile % files.count]
-        nextFile += 1
+        guard let url = nextTrack(), let f = try? AVAudioFile(forReading: url) else { return }
         let gen = generation
         player.scheduleFile(f, at: nil, completionCallbackType: .dataConsumed) { _ in
             Task { @MainActor in
@@ -103,6 +111,18 @@ final class AmbientMusic {
                 if m.generation == gen, m.scheduled { m.scheduleNext() }
             }
         }
+    }
+
+    /// Shuffled cycles over all tracks; a new cycle never starts with the track that just played.
+    private func nextTrack() -> URL? {
+        guard !tracks.isEmpty else { return nil }
+        if order.isEmpty {
+            order = tracks.shuffled()
+            if order.count > 1, order.first == lastQueued { order.swapAt(0, Int.random(in: 1..<order.count)) }
+        }
+        let url = order.removeFirst()
+        lastQueued = url
+        return url
     }
 
     private func restartAfterConfigChange() {

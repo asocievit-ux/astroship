@@ -13,7 +13,7 @@
 | Galaxy top view, sun glow, star sprite, app icon | Generated procedurally by `tools/build_assets.py` / icon script | Own work |
 
 ## Background music
-Played in this order as a looping playlist (re-encoded to AAC 144 kbps stereo; files `Resources/Audio/bgm1-4.m4a`).
+Played as an endless playlist in shuffled order (reshuffled every cycle, no back-to-back repeats). Re-encoded to AAC 144 kbps, 44.1 kHz stereo; files `Resources/Audio/bgm1-4.m4a`. Every audio file in `Resources/Audio` is picked up automatically — add one with `tools/add_bgm.sh` and list it here.
 All four are used under the **Pixabay Content License** — summary: https://pixabay.com/service/license-summary/
 
 | # | File | Title | Creator (Pixabay) | Pixabay page | Length |
