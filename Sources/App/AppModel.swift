@@ -147,9 +147,9 @@ final class AppModel: ObservableObject {
         viewing = true           // hide every bar and card, like viewing mode
         showInfo = false
         touring = true
-        tour.start(at: index)
         // A clean sky for the tour: no orbit lines / trails (restored afterwards).
         optionsBeforeTour = options
+        tour.start(at: index)
         options.orbits = false
         options.trails = false
         options.belt = true
