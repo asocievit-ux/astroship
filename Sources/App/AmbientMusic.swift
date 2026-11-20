@@ -4,8 +4,8 @@ import Foundation
 /// Background music: every audio file in the bundle's Audio folder (Resources/Audio, licences in
 /// docs/licenses.md) played as an endless gapless playlist in shuffled order, reshuffled each cycle
 /// without repeating a track back-to-back. Adding a track = dropping a 44.1 kHz stereo file in
-/// Resources/Audio (tools/add_bgm.sh re-encodes one). Plays from launch at a modest volume. Session category .ambient: mixes with other audio and
-/// respects the silent switch; the hardware volume buttons set the level. Pauses in the background.
+/// Resources/Audio (tools/add_bgm.sh re-encodes one). Plays from launch at a modest volume. Session category .playback: plays even with the silent switch on
+/// (user request); the hardware volume buttons set the level. Pauses in the background.
 @MainActor
 final class AmbientMusic {
     static let shared = AmbientMusic()
@@ -111,7 +111,7 @@ final class AmbientMusic {
         guard wantsPlay, configure(), format != nil else { return }
         do {
             let s = AVAudioSession.sharedInstance()
-            try s.setCategory(.ambient, mode: .default, options: [.mixWithOthers])
+            try s.setCategory(.playback, mode: .default, options: [])   // plays with the silent switch on
             try s.setActive(true)
             if !engine.isRunning { try engine.start() }
             if !player.isPlaying {
