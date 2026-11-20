@@ -1,10 +1,64 @@
 import simd
 import Foundation
+import SwiftUI
 import AstroCore
 
-/// Localized string from Localizable.strings (11 languages; base English).
-func L(_ key: String) -> String { NSLocalizedString(key, comment: "") }
-func L(_ key: String, _ args: CVarArg...) -> String { String(format: NSLocalizedString(key, comment: ""), locale: Locale.current, arguments: args) }
+/// Localized string from Localizable.strings (11 languages; base English), in the language picked in
+/// Settings (or the system's).
+func L(_ key: String) -> String { NSLocalizedString(key, bundle: AppLanguage.bundle, comment: "") }
+func L(_ key: String, _ args: CVarArg...) -> String {
+    String(format: NSLocalizedString(key, bundle: AppLanguage.bundle, comment: ""), locale: AppLanguage.locale, arguments: args)
+}
+
+/// In-app language override (Settings > Language). "" = follow the system. Switching applies at once:
+/// the root view swaps its locale / layout direction environment and rebuilds the UI layer (not the scene).
+final class AppLanguage: ObservableObject {
+    static let shared = AppLanguage()
+    static let codes = ["en", "ja", "zh-Hans", "es", "pt", "fr", "de", "tl", "ru", "sv", "he"]
+    private static let key = "app.language"
+
+    nonisolated(unsafe) private(set) static var bundle: Bundle = .main
+    nonisolated(unsafe) private(set) static var locale: Locale = .current
+
+    @Published var code: String {
+        didSet {
+            UserDefaults.standard.set(code, forKey: Self.key)
+            Self.apply(code)
+        }
+    }
+
+    private init() {
+        let c = UserDefaults.standard.string(forKey: Self.key) ?? ""
+        code = Self.codes.contains(c) ? c : ""
+        Self.apply(code)
+    }
+
+    private static func apply(_ c: String) {
+        if c.isEmpty {
+            bundle = .main
+            locale = .current
+        } else {
+            bundle = Bundle.main.path(forResource: c, ofType: "lproj").flatMap(Bundle.init(path:)) ?? .main
+            locale = Locale(identifier: c)
+        }
+        Fmt.resetFormatters()
+    }
+
+    /// Effective language (override, else the localization the system picked for the app).
+    var effectiveCode: String { code.isEmpty ? (Bundle.main.preferredLocalizations.first ?? "en") : code }
+    var layoutDirection: LayoutDirection {
+        Locale.Language(identifier: effectiveCode).characterDirection == .rightToLeft ? .rightToLeft : .leftToRight
+    }
+
+    var environmentLocale: Locale { code.isEmpty ? .current : Locale(identifier: code) }
+
+    /// Each language in its own name ("日本語", "Español", "עברית" …).
+    static func nativeName(_ c: String) -> String {
+        let l = Locale(identifier: c)
+        let n = l.localizedString(forIdentifier: c) ?? c
+        return n.prefix(1).uppercased(with: l) + n.dropFirst()
+    }
+}
 
 extension BodyID {
     var localizedName: String { L("body.\(key)") }
@@ -25,6 +79,7 @@ extension BodyKind {
 enum Fmt {
     static func number(_ v: Double, digits: Int = 0) -> String {
         let f = NumberFormatter()
+        f.locale = AppLanguage.locale
         f.numberStyle = .decimal
         f.maximumFractionDigits = digits
         f.minimumFractionDigits = digits
@@ -50,10 +105,25 @@ enum Fmt {
         return L("unit.lightHours", number(s / 3600, digits: 2))
     }
 
-    static let dateFormatter: DateFormatter = {
+    nonisolated(unsafe) private static var cachedDate: DateFormatter?
+    static var dateFormatter: DateFormatter {
+        if let f = cachedDate { return f }
         let f = DateFormatter()
+        f.locale = AppLanguage.locale
         f.dateStyle = .medium
         f.timeStyle = .medium
+        cachedDate = f
         return f
-    }()
+    }
+    static func resetFormatters() { cachedDate = nil }
+}
+
+extension View {
+    /// Locale + layout direction (RTL for Hebrew) of the in-app language; `.id` rebuilds text that was
+    /// resolved through `L()`.
+    func appLanguage(_ lang: AppLanguage) -> some View {
+        self.environment(\.locale, lang.environmentLocale)
+            .environment(\.layoutDirection, lang.layoutDirection)
+            .environmentObject(lang)
+    }
 }

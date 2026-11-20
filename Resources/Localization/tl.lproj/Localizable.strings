@@ -84,6 +84,17 @@
 "kind.moon" = "Buwan";
 "kind.planet" = "Planeta";
 "kind.star" = "Bituin";
+"language.system" = "Default ng system";
+"music.exclude" = "Laktawan ang track na ito";
+"music.footer" = "Random ang pagkakasunod. ⊖ para laktawan ang track (may matitirang isa). I-tap ang track para ulitin.";
+"music.include" = "Isama muli ang track";
+"music.next" = "Susunod na track";
+"music.nowPlaying" = "Tumutugtog";
+"music.pause" = "I-pause";
+"music.play" = "I-play";
+"music.previous" = "Nakaraang track";
+"music.repeatOne" = "Ulitin ang track na ito";
+"music.tracks" = "Mga track";
 "picker.comets" = "Mga kometa";
 "picker.dwarfs" = "Planetang unano at asteroid";
 "picker.moons" = "Mga buwan";
@@ -96,6 +107,7 @@
 "settings.display" = "Ipakita";
 "settings.dwarfs" = "Planetang unano at asteroid";
 "settings.labels" = "Mga pangalan at marka";
+"settings.language" = "Wika";
 "settings.moons" = "Mga buwan";
 "settings.music" = "Musika (528 Hz)";
 "settings.orbits" = "Mga orbit (sa Araw)";

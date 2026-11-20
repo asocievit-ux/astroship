@@ -84,6 +84,17 @@
 "kind.moon" = "Satellite";
 "kind.planet" = "Planète";
 "kind.star" = "Étoile";
+"language.system" = "Langue du système";
+"music.exclude" = "Ignorer ce morceau";
+"music.footer" = "Ordre aléatoire. ⊖ ignore un morceau (au moins un reste). Touchez un morceau pour le répéter.";
+"music.include" = "Réinclure ce morceau";
+"music.next" = "Morceau suivant";
+"music.nowPlaying" = "En cours";
+"music.pause" = "Pause";
+"music.play" = "Lecture";
+"music.previous" = "Morceau précédent";
+"music.repeatOne" = "Répéter ce morceau";
+"music.tracks" = "Morceaux";
 "picker.comets" = "Comètes";
 "picker.dwarfs" = "Planètes naines et astéroïdes";
 "picker.moons" = "Satellites";
@@ -96,6 +107,7 @@
 "settings.display" = "Afficher";
 "settings.dwarfs" = "Planètes naines et astéroïdes";
 "settings.labels" = "Noms et repères";
+"settings.language" = "Langue";
 "settings.moons" = "Satellites";
 "settings.music" = "Musique (528 Hz)";
 "settings.orbits" = "Orbites (centré Soleil)";

@@ -2,28 +2,46 @@ import AVFoundation
 import Foundation
 
 /// Background music: every audio file in the bundle's Audio folder (Resources/Audio, licences in
-/// docs/licenses.md) played as an endless gapless playlist in shuffled order, reshuffled each cycle
-/// without repeating a track back-to-back. Adding a track = dropping a 44.1 kHz stereo file in
-/// Resources/Audio (tools/add_bgm.sh re-encodes one). Plays from launch at a modest volume. Session category .playback: plays even with the silent switch on
-/// (user request); the hardware volume buttons set the level. Pauses in the background.
+/// docs/licenses.md) played as an endless playlist, always shuffled among the tracks the user has not
+/// excluded (minus button in the music screen), reshuffled each cycle without back-to-back repeats.
+/// Tapping a track in the music screen plays it in repeat-one mode. Adding a track = dropping a
+/// 44.1 kHz stereo file in Resources/Audio (tools/add_bgm.sh) and a line in `BGMCatalog`.
+/// Session category .playback: plays even with the silent switch on (user request); the hardware
+/// volume buttons set the level. Pauses in the background.
 @MainActor
-final class AmbientMusic {
+final class AmbientMusic: ObservableObject {
     static let shared = AmbientMusic()
 
     private let engine = AVAudioEngine()
     private let player = AVAudioPlayerNode()
-    // Streamed from disk (far too long to hold decoded). The next track is always queued behind the
-    // playing one, so the playlist is gapless. Each scheduled pass opens its own reader.
-    private var tracks: [URL] = []
-    private var order: [URL] = []          // remaining tracks of the current shuffled cycle
-    private var lastQueued: URL?
+    /// All bundled tracks in list (file-name) order. Streamed from disk, one reader per pass.
+    @Published private(set) var tracks: [BGMTrack] = []
+    @Published private(set) var current: BGMTrack?
+    @Published private(set) var isPlaying = false
+    /// File names the user excluded with the minus button (persisted; at least one track stays in).
+    @Published private(set) var excluded: Set<String>
+    /// Repeat the current track forever (set by tapping a track; toggle in the music screen).
+    @Published var repeatOne: Bool {
+        didSet { UserDefaults.standard.set(repeatOne, forKey: Self.repeatKey) }
+    }
+
+    private var order: [BGMTrack] = []        // remaining tracks of the current shuffled cycle
+    private var history: [BGMTrack] = []      // for the previous button
     private var format: AVAudioFormat?
     static let audioExtensions: Set<String> = ["m4a", "mp3", "aac", "wav", "caf", "aif", "aiff"]
     private var configured = false
     private var wantsPlay = false
     private let volume: Float = 0.35
+    private var generation = 0
+    nonisolated static let enabledKey = "music.enabled"
+    private static let excludedKey = "music.excluded"
+    private static let repeatKey = "music.repeatOne"
+    private static let currentKey = "music.current"
 
     private init() {
+        let d = UserDefaults.standard
+        excluded = Set(d.stringArray(forKey: Self.excludedKey) ?? [])
+        repeatOne = d.bool(forKey: Self.repeatKey)
         let nc = NotificationCenter.default
         nc.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { note in
             let raw = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt
@@ -34,8 +52,10 @@ final class AmbientMusic {
         nc.addObserver(forName: .AVAudioEngineConfigurationChange, object: nil, queue: .main) { _ in
             Task { @MainActor in AmbientMusic.shared.restartAfterConfigChange() }
         }
+        _ = configure()
     }
 
+    @discardableResult
     private func configure() -> Bool {
         if configured { return format != nil }
         configured = true
@@ -43,13 +63,21 @@ final class AmbientMusic {
               let urls = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)
         else { return false }
         let candidates = urls.filter { Self.audioExtensions.contains($0.pathExtension.lowercased()) }
-            .sorted { $0.lastPathComponent < $1.lastPathComponent }
+            .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
         // The player node runs at one format; keep only tracks that match the first readable one.
+        var list: [BGMTrack] = []
         for url in candidates {
             guard let f = try? AVAudioFile(forReading: url) else { continue }
             if format == nil { format = f.processingFormat }
-            if f.processingFormat == format { tracks.append(url) }
+            if f.processingFormat == format {
+                list.append(BGMTrack(url: url, duration: Double(f.length) / f.processingFormat.sampleRate))
+            }
         }
+        tracks = list
+        excluded = excluded.intersection(list.map(\.id))
+        if excluded.count >= list.count { excluded = [] }
+        if repeatOne, let id = UserDefaults.standard.string(forKey: Self.currentKey),
+           let t = list.first(where: { $0.id == id }), !excluded.contains(id) { current = t }
         guard let fmt = format, !tracks.isEmpty else { return false }
         engine.attach(player)
         engine.connect(player, to: engine.mainMixerNode, format: fmt)
@@ -57,7 +85,6 @@ final class AmbientMusic {
         return true
     }
 
-    nonisolated static let enabledKey = "music.enabled"
     /// Settings switch (persisted, default on).
     static var enabled: Bool {
         UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true
@@ -65,6 +92,7 @@ final class AmbientMusic {
 
     func setEnabled(_ on: Bool) {
         UserDefaults.standard.set(on, forKey: Self.enabledKey)
+        objectWillChange.send()
         if on { start() } else { pause() }
     }
 
@@ -75,6 +103,67 @@ final class AmbientMusic {
         wantsPlay = true
         resumeIfWanted()
     }
+
+    // MARK: Music screen actions
+
+    func isIncluded(_ t: BGMTrack) -> Bool { !excluded.contains(t.id) }
+    var includedCount: Int { tracks.filter(isIncluded).count }
+
+    /// Minus / plus button. The last included track cannot be excluded.
+    func toggleIncluded(_ t: BGMTrack) {
+        if excluded.contains(t.id) {
+            excluded.remove(t.id)
+        } else {
+            guard includedCount > 1 else { return }
+            excluded.insert(t.id)
+            order.removeAll { $0 == t }
+            if current == t { skip(to: nextTrack(after: t, ignoringRepeat: true)) }
+        }
+        UserDefaults.standard.set(Array(excluded).sorted(), forKey: Self.excludedKey)
+    }
+
+    /// Tapping a row: play it on repeat-one (re-including it if it was excluded).
+    func playOnRepeat(_ t: BGMTrack) {
+        if excluded.contains(t.id) { toggleIncluded(t) }
+        repeatOne = true
+        if !Self.enabled { UserDefaults.standard.set(true, forKey: Self.enabledKey); objectWillChange.send() }
+        skip(to: t)
+    }
+
+    func next() { skip(to: nextTrack(after: current, ignoringRepeat: true)) }
+
+    func previous() {
+        while let t = history.popLast() {
+            if isIncluded(t), t != current { skip(to: t, record: false); return }
+        }
+        // No history: step back in list order among included tracks.
+        let inc = tracks.filter(isIncluded)
+        guard !inc.isEmpty else { return }
+        let i = current.flatMap { inc.firstIndex(of: $0) } ?? 0
+        skip(to: inc[(i - 1 + inc.count) % inc.count], record: false)
+    }
+
+    func togglePlay() { setEnabled(!(Self.enabled && isPlaying)) }
+
+    private func skip(to t: BGMTrack?, record: Bool = true) {
+        guard let t else { return }
+        if record, let c = current { history.append(c); if history.count > 50 { history.removeFirst() } }
+        generation += 1
+        scheduled = false
+        player.stop()
+        setCurrent(t)
+        if Self.enabled, !SleepTimer.shared.asleep {
+            wantsPlay = true
+            resumeIfWanted()
+        }
+    }
+
+    private func setCurrent(_ t: BGMTrack?) {
+        current = t
+        UserDefaults.standard.set(t?.id, forKey: Self.currentKey)
+    }
+
+    // MARK: Engine
 
     private var fadeTimer: Timer?
 
@@ -105,6 +194,7 @@ final class AmbientMusic {
         wantsPlay = false
         player.pause()
         engine.pause()
+        isPlaying = false
     }
 
     func resumeIfWanted() {
@@ -116,46 +206,90 @@ final class AmbientMusic {
             if !engine.isRunning { try engine.start() }
             if !player.isPlaying {
                 if !scheduled {
-                    scheduled = true
-                    scheduleNext(); scheduleNext()   // playing track + the next one queued -> gapless
+                    if current == nil || !isIncluded(current!) {
+                        setCurrent(nextTrack(after: nil, ignoringRepeat: true))
+                    }
+                    if let c = current { schedule(c) }
                 }
                 player.play()
             }
+            isPlaying = player.isPlaying
         } catch {
             // Audio is decoration only; ignore failures (e.g. another app holds the hardware).
         }
     }
 
     private var scheduled = false
-    private var generation = 0
 
-    private func scheduleNext() {
-        guard let url = nextTrack(), let f = try? AVAudioFile(forReading: url) else { return }
+    /// One track at a time; the next is scheduled the moment this one finishes playing (the node keeps
+    /// running, so the hand-over is a few ms). Changing the exclusions / repeat mode applies to the next
+    /// track without cutting the current one.
+    private func schedule(_ t: BGMTrack) {
+        guard let f = try? AVAudioFile(forReading: t.url) else { return }
+        scheduled = true
         let gen = generation
-        player.scheduleFile(f, at: nil, completionCallbackType: .dataConsumed) { _ in
+        player.scheduleFile(f, at: nil, completionCallbackType: .dataPlayedBack) { _ in
             Task { @MainActor in
                 let m = AmbientMusic.shared
-                if m.generation == gen, m.scheduled { m.scheduleNext() }
+                guard m.generation == gen, m.scheduled else { return }
+                let n = m.nextTrack(after: m.current, ignoringRepeat: false)
+                if let c = m.current, n != c { m.history.append(c); if m.history.count > 50 { m.history.removeFirst() } }
+                m.setCurrent(n)
+                if let n { m.schedule(n) } else { m.scheduled = false }
             }
         }
     }
 
-    /// Shuffled cycles over all tracks; a new cycle never starts with the track that just played.
-    private func nextTrack() -> URL? {
-        guard !tracks.isEmpty else { return nil }
+    /// Repeat-one keeps the track; otherwise shuffled cycles over the included tracks, never the same
+    /// track twice in a row.
+    private func nextTrack(after last: BGMTrack?, ignoringRepeat: Bool) -> BGMTrack? {
+        if !ignoringRepeat, repeatOne, let last, isIncluded(last) { return last }
+        let inc = tracks.filter(isIncluded)
+        guard !inc.isEmpty else { return tracks.first }
+        order.removeAll { !isIncluded($0) }
         if order.isEmpty {
-            order = tracks.shuffled()
-            if order.count > 1, order.first == lastQueued { order.swapAt(0, Int.random(in: 1..<order.count)) }
+            order = inc.shuffled()
+            if order.count > 1, order.first == last { order.swapAt(0, Int.random(in: 1..<order.count)) }
         }
-        let url = order.removeFirst()
-        lastQueued = url
-        return url
+        var t = order.removeFirst()
+        if t == last, !order.isEmpty { order.append(t); t = order.removeFirst() }
+        return t
     }
 
     private func restartAfterConfigChange() {
         scheduled = false
         generation += 1
         player.stop()
+        isPlaying = false
         resumeIfWanted()
     }
+}
+
+struct BGMTrack: Identifiable, Hashable {
+    let url: URL
+    let duration: Double
+    var id: String { url.deletingPathExtension().lastPathComponent }
+    var title: String { BGMCatalog.info[id]?.title ?? id }
+    var artist: String { BGMCatalog.info[id]?.artist ?? "" }
+    var durationText: String {
+        let s = Int(duration.rounded()); return String(format: "%d:%02d", s / 60, s % 60)
+    }
+}
+
+/// Display names for the bundled tracks (Pixabay titles and creators; see docs/licenses.md).
+enum BGMCatalog {
+    static let info: [String: (title: String, artist: String)] = [
+        "bgm1": ("Meditation Binaural 8 Hz 528 Hz", "Siarhei Korbut"),
+        "bgm2": ("Activate Feminine Energy", "Soul Frequencies"),
+        "bgm3": ("528 Hz Frequency Ambient Music", "Ribhav Agrawal"),
+        "bgm4": ("Revelation of the Misty Planet", "Siarhei Korbut"),
+        "bgm5": ("Sunset Glow", "Siarhei Korbut"),
+        "bgm6": ("Angels Lullaby 528 Hz", "Siarhei Korbut"),
+        "bgm7": ("528 Hz Solar Plexus Chakra Healing", "Roman Sol"),
+        "bgm8": ("あなたはちゃんと守られるから、安心してね。", "KI-chorus"),
+        "bgm9": ("528 Hz Résonance Solaire Arcturienne", "C-STyLe-Background"),
+        "bgm10": ("639 Hz Harmonie du cœur arcturien", "C-STyLe-Background"),
+        "bgm11": ("528 Hz Angelic Choir Meditation 2", "Megis-music"),
+        "bgm12": ("963 Hz Énergie Arcturienne", "C-STyLe-Background"),
+    ]
 }

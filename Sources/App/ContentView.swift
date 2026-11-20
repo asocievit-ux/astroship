@@ -5,6 +5,7 @@ import AstroCore
 struct ContentView: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var store: RemoveAdsStore
+    @EnvironmentObject var lang: AppLanguage
 
     var body: some View {
         ZStack {
@@ -20,6 +21,7 @@ struct ContentView: View {
                 }
                 .padding(.horizontal, 12)
                 .padding(.bottom, 8)
+                .id(lang.code)
                 .transition(.opacity)
             }
         }
@@ -28,11 +30,14 @@ struct ContentView: View {
         .persistentSystemOverlays(model.viewing ? .hidden : .automatic)
         .background(Color.black)
         .preferredColorScheme(.dark)
-        .sheet(isPresented: $model.showPicker) { BodyPicker().environmentObject(model) }
+        .sheet(isPresented: $model.showPicker) { BodyPicker().environmentObject(model).appLanguage(lang).id(lang.code) }
         .sheet(isPresented: $model.showSettings) {
             SettingsView().environmentObject(model).environmentObject(store).environmentObject(SleepTimer.shared)
+                .appLanguage(lang).id(lang.code)
         }
-        .fullScreenCover(isPresented: $model.showGalaxy) { GalaxyScreen().environmentObject(model) }
+        .fullScreenCover(isPresented: $model.showGalaxy) {
+            GalaxyScreen().environmentObject(model).appLanguage(lang).id(lang.code)
+        }
     }
 }
 

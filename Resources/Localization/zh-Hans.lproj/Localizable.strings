@@ -84,6 +84,17 @@
 "kind.moon" = "卫星";
 "kind.planet" = "行星";
 "kind.star" = "恒星";
+"language.system" = "跟随系统";
+"music.exclude" = "不播放此曲";
+"music.footer" = "随机播放。⊖ 可排除曲目（至少保留一首）。点按曲目即单曲循环。";
+"music.include" = "重新播放此曲";
+"music.next" = "下一首";
+"music.nowPlaying" = "正在播放";
+"music.pause" = "暂停";
+"music.play" = "播放";
+"music.previous" = "上一首";
+"music.repeatOne" = "单曲循环";
+"music.tracks" = "曲目";
 "picker.comets" = "彗星";
 "picker.dwarfs" = "矮行星与小行星";
 "picker.moons" = "卫星";
@@ -96,6 +107,7 @@
 "settings.display" = "显示";
 "settings.dwarfs" = "矮行星与小行星";
 "settings.labels" = "名称和标记";
+"settings.language" = "语言";
 "settings.moons" = "卫星";
 "settings.music" = "音乐（528Hz）";
 "settings.orbits" = "轨道（以太阳为中心）";

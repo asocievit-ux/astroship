@@ -84,6 +84,17 @@
 "kind.moon" = "ירח";
 "kind.planet" = "כוכב לכת";
 "kind.star" = "כוכב";
+"language.system" = "ברירת המחדל של המערכת";
+"music.exclude" = "דלג על הרצועה";
+"music.footer" = "סדר אקראי. ⊖ מדלג על רצועה (לפחות אחת נשארת). הקש על רצועה כדי לחזור עליה.";
+"music.include" = "החזר את הרצועה";
+"music.next" = "הרצועה הבאה";
+"music.nowPlaying" = "מתנגן עכשיו";
+"music.pause" = "השהה";
+"music.play" = "נגן";
+"music.previous" = "הרצועה הקודמת";
+"music.repeatOne" = "חזרה על הרצועה";
+"music.tracks" = "רצועות";
 "picker.comets" = "שביטים";
 "picker.dwarfs" = "כוכבי לכת ננסיים ואסטרואידים";
 "picker.moons" = "ירחים";
@@ -96,6 +107,7 @@
 "settings.display" = "הצגה";
 "settings.dwarfs" = "כוכבי לכת ננסיים";
 "settings.labels" = "שמות וסימונים";
+"settings.language" = "שפה";
 "settings.moons" = "ירחים";
 "settings.music" = "מוזיקה (528 הרץ)";
 "settings.orbits" = "מסלולים (סביב השמש)";

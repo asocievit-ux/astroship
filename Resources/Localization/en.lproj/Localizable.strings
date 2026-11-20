@@ -84,6 +84,17 @@
 "kind.moon" = "Moon";
 "kind.planet" = "Planet";
 "kind.star" = "Star";
+"language.system" = "System default";
+"music.exclude" = "Skip this track";
+"music.footer" = "Plays in random order. ⊖ skips a track (at least one stays on). Tap a track to repeat it.";
+"music.include" = "Play this track again";
+"music.next" = "Next track";
+"music.nowPlaying" = "Now playing";
+"music.pause" = "Pause";
+"music.play" = "Play";
+"music.previous" = "Previous track";
+"music.repeatOne" = "Repeat this track";
+"music.tracks" = "Tracks";
 "picker.comets" = "Comets";
 "picker.dwarfs" = "Dwarf planets & asteroids";
 "picker.moons" = "Moons";
@@ -96,6 +107,7 @@
 "settings.display" = "Show";
 "settings.dwarfs" = "Dwarf planets & asteroids";
 "settings.labels" = "Names and markers";
+"settings.language" = "Language";
 "settings.moons" = "Moons";
 "settings.music" = "Music (528 Hz)";
 "settings.orbits" = "Orbits (Sun-centered)";

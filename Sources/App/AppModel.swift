@@ -58,6 +58,7 @@ final class AppModel: ObservableObject {
     @Published var showGalaxy = false
     @Published var showPicker = false
     @Published var showSettings = false
+    @Published var showMusic = false   // Settings > Music pushed (screenshot mode)
     @Published var showInfo = true
     /// Viewing mode: every bar and card hidden, only the scene. Any tap brings the controls back.
     @Published var viewing = false
@@ -267,6 +268,21 @@ final class AppModel: ObservableObject {
             applyOpeningView()
             viewing = false
             SleepTimer.shared.minutes = 30
+            showSettings = true
+            return
+        case "music":
+            applyOpeningView()
+            viewing = false
+            let m = AmbientMusic.shared
+            if let t = m.tracks.dropFirst(1).first, m.isIncluded(t) { m.toggleIncluded(t) }
+            if let t = m.tracks.dropFirst(3).first { m.playOnRepeat(t) }
+            showSettings = true
+            showMusic = true
+            return
+        case "languagehe":
+            applyOpeningView()
+            viewing = false
+            AppLanguage.shared.code = "he"
             showSettings = true
             return
         case "picker":

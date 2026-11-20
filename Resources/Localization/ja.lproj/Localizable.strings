@@ -84,6 +84,17 @@
 "kind.moon" = "衛星";
 "kind.planet" = "惑星";
 "kind.star" = "恒星";
+"language.system" = "システム設定";
+"music.exclude" = "この曲を再生しない";
+"music.footer" = "ランダム再生。⊖で曲を外せます（最低1曲は残ります）。曲をタップするとその曲をリピート。";
+"music.include" = "この曲を再生する";
+"music.next" = "次の曲";
+"music.nowPlaying" = "再生中";
+"music.pause" = "一時停止";
+"music.play" = "再生";
+"music.previous" = "前の曲";
+"music.repeatOne" = "1曲リピート";
+"music.tracks" = "曲";
 "picker.comets" = "彗星";
 "picker.dwarfs" = "準惑星・小惑星";
 "picker.moons" = "衛星";
@@ -96,6 +107,7 @@
 "settings.display" = "表示";
 "settings.dwarfs" = "準惑星・小惑星";
 "settings.labels" = "名前と目印";
+"settings.language" = "言語";
 "settings.moons" = "衛星";
 "settings.music" = "音楽（528Hz）";
 "settings.orbits" = "軌道（太陽中心）";

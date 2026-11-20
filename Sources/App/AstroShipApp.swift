@@ -7,6 +7,7 @@ struct AstroShipApp: App {
     @StateObject private var model = AppModel()
     @StateObject private var store = RemoveAdsStore.shared
     @StateObject private var sleepTimer = SleepTimer.shared
+    @StateObject private var lang = AppLanguage.shared
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
@@ -15,6 +16,7 @@ struct AstroShipApp: App {
                 .environmentObject(model)
                 .environmentObject(store)
                 .environmentObject(sleepTimer)
+                .appLanguage(lang)
                 .task {
                     sleepTimer.onSleep = { [weak m = model] in m?.setRendering(false) }
                     sleepTimer.onWake = { [weak m = model] in m?.setRendering(true) }

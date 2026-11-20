@@ -84,6 +84,17 @@
 "kind.moon" = "Спутник";
 "kind.planet" = "Планета";
 "kind.star" = "Звезда";
+"language.system" = "Как в системе";
+"music.exclude" = "Не играть этот трек";
+"music.footer" = "Случайный порядок. ⊖ исключает трек (хотя бы один остаётся). Нажмите на трек, чтобы повторять его.";
+"music.include" = "Снова играть трек";
+"music.next" = "Следующий трек";
+"music.nowPlaying" = "Сейчас играет";
+"music.pause" = "Пауза";
+"music.play" = "Играть";
+"music.previous" = "Предыдущий трек";
+"music.repeatOne" = "Повтор трека";
+"music.tracks" = "Треки";
 "picker.comets" = "Кометы";
 "picker.dwarfs" = "Карликовые планеты и астероиды";
 "picker.moons" = "Спутники";
@@ -96,6 +107,7 @@
 "settings.display" = "Показывать";
 "settings.dwarfs" = "Карликовые планеты";
 "settings.labels" = "Названия и метки";
+"settings.language" = "Язык";
 "settings.moons" = "Спутники";
 "settings.music" = "Музыка (528 Гц)";
 "settings.orbits" = "Орбиты (от Солнца)";

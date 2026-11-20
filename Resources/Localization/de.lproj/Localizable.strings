@@ -84,6 +84,17 @@
 "kind.moon" = "Mond";
 "kind.planet" = "Planet";
 "kind.star" = "Stern";
+"language.system" = "Systemstandard";
+"music.exclude" = "Titel auslassen";
+"music.footer" = "Zufällige Reihenfolge. ⊖ lässt einen Titel aus (mindestens einer bleibt). Titel antippen zum Wiederholen.";
+"music.include" = "Titel wieder einschließen";
+"music.next" = "Nächster Titel";
+"music.nowPlaying" = "Läuft gerade";
+"music.pause" = "Pause";
+"music.play" = "Abspielen";
+"music.previous" = "Vorheriger Titel";
+"music.repeatOne" = "Titel wiederholen";
+"music.tracks" = "Titel";
 "picker.comets" = "Kometen";
 "picker.dwarfs" = "Zwergplaneten & Asteroiden";
 "picker.moons" = "Monde";
@@ -96,6 +107,7 @@
 "settings.display" = "Anzeigen";
 "settings.dwarfs" = "Zwergplaneten & Asteroiden";
 "settings.labels" = "Namen und Markierungen";
+"settings.language" = "Sprache";
 "settings.moons" = "Monde";
 "settings.music" = "Musik (528 Hz)";
 "settings.orbits" = "Bahnen (sonnenzentriert)";

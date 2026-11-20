@@ -84,6 +84,17 @@
 "kind.moon" = "Måne";
 "kind.planet" = "Planet";
 "kind.star" = "Stjärna";
+"language.system" = "Systemets språk";
+"music.exclude" = "Hoppa över spåret";
+"music.footer" = "Slumpvis ordning. ⊖ hoppar över ett spår (minst ett finns kvar). Tryck på ett spår för att upprepa det.";
+"music.include" = "Ta med spåret igen";
+"music.next" = "Nästa spår";
+"music.nowPlaying" = "Spelas nu";
+"music.pause" = "Pausa";
+"music.play" = "Spela";
+"music.previous" = "Föregående spår";
+"music.repeatOne" = "Upprepa spåret";
+"music.tracks" = "Spår";
 "picker.comets" = "Kometer";
 "picker.dwarfs" = "Dvärgplaneter och asteroider";
 "picker.moons" = "Månar";
@@ -96,6 +107,7 @@
 "settings.display" = "Visa";
 "settings.dwarfs" = "Dvärgplaneter";
 "settings.labels" = "Namn och markörer";
+"settings.language" = "Språk";
 "settings.moons" = "Månar";
 "settings.music" = "Musik (528 Hz)";
 "settings.orbits" = "Banor (solcentrerad)";
