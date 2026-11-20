@@ -126,10 +126,14 @@ struct SolarImmersiveView: View {
     }
 
     static func saturnRing() -> Entity {
-        let mesh = MeshResource.generatePlane(width: 0.12, depth: 0.12)
+        let mesh = MeshResource.generatePlane(width: 0.13, depth: 0.13)
         var m = UnlitMaterial(color: .white)
-        if let t = texture("saturn_ring.png") { m.color = .init(tint: .white, texture: .init(t)) }
-        m.blending = .transparent(opacity: .init(floatLiteral: 0.9))
+        if let t = texture("saturn_ring_disc.png") { m.color = .init(tint: .white, texture: .init(t)) }
+        if let a = texture("saturn_ring_alpha.png") {
+            m.blending = .transparent(opacity: .init(scale: 0.95, texture: .init(a)))
+        } else {
+            m.blending = .transparent(opacity: .init(floatLiteral: 0.6))
+        }
         let e = ModelEntity(mesh: mesh, materials: [m])
         e.orientation = simd_quatf(angle: 0.47, axis: [1, 0, 0])
         return e
