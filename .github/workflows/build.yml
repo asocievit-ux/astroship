@@ -11,7 +11,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: astroship-build
+  group: astroship-build-${{ inputs.runner || 'macos-15' }}
   cancel-in-progress: true
 jobs:
   build:
