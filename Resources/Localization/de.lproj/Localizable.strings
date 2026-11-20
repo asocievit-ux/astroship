@@ -59,8 +59,8 @@
 "common.close" = "Schließen";
 "common.done" = "Fertig";
 "credits.body" = "Die Positionen werden auf dem Gerät aus veröffentlichten Bahntheorien berechnet. Die Galaxienkarte ist eine Illustration, kein Foto.";
-"frame.galaxy" = "Reise durch die Galaxis";
-"frame.sun" = "Sonnenzentriert";
+"frame.galaxy" = "Galaxis";
+"frame.sun" = "Sonne";
 "galaxy.center" = "Galaktisches Zentrum (Sgr A*)";
 "galaxy.direction" = "Flugrichtung";
 "galaxy.facts" = "Etwa %@ Lichtjahre vom Zentrum entfernt. Eine Runde dauert rund %@ Millionen Jahre.";

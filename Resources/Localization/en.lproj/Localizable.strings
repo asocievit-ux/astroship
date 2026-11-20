@@ -59,8 +59,8 @@
 "common.close" = "Close";
 "common.done" = "Done";
 "credits.body" = "Positions are calculated on the device from published orbital theories. The galaxy map is an illustration, not a photograph.";
-"frame.galaxy" = "Galactic motion";
-"frame.sun" = "Sun-centered";
+"frame.galaxy" = "Galaxy";
+"frame.sun" = "Solar";
 "galaxy.center" = "Galactic center (Sgr A*)";
 "galaxy.direction" = "Direction of travel";
 "galaxy.facts" = "About %@ light-years from the center. One lap takes about %@ million years.";

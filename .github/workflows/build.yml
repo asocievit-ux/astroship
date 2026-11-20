@@ -76,6 +76,10 @@ jobs:
             sleep 12
             xcrun simctl io "$UDID" screenshot "$RUNNER_TEMP/shots/${TAG}-earth-en.png"
             xcrun simctl terminate "$UDID" com.aihasakuramoto22.solarmotion 2>/dev/null || true
+            xcrun simctl launch "$UDID" com.aihasakuramoto22.solarmotion -shot opening -AppleLanguages "(en)" -AppleLocale en_US
+            sleep 12
+            xcrun simctl io "$UDID" screenshot "$RUNNER_TEMP/shots/${TAG}-opening-en.png"
+            xcrun simctl terminate "$UDID" com.aihasakuramoto22.solarmotion 2>/dev/null || true
             xcrun simctl launch "$UDID" com.aihasakuramoto22.solarmotion -shot galactic -AppleLanguages "(he)" -AppleLocale he_IL
             sleep 12
             xcrun simctl io "$UDID" screenshot "$RUNNER_TEMP/shots/${TAG}-galactic-he.png"

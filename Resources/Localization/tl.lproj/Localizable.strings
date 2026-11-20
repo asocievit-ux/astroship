@@ -59,8 +59,8 @@
 "common.close" = "Isara";
 "common.done" = "Tapos";
 "credits.body" = "Kinakalkula sa device ang mga posisyon mula sa nailathalang teorya ng orbit. Ang mapa ng galaxy ay ilustrasyon, hindi litrato.";
-"frame.galaxy" = "Paglalakbay sa galaxy";
-"frame.sun" = "Nakasentro sa Araw";
+"frame.galaxy" = "Galaxy";
+"frame.sun" = "Araw";
 "galaxy.center" = "Gitna ng galaxy (Sgr A*)";
 "galaxy.direction" = "Direksyon ng paglalakbay";
 "galaxy.facts" = "Mga %@ light-year mula sa gitna. Ang isang ikot ay mga %@ milyong taon.";

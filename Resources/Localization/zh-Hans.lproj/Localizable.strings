@@ -59,8 +59,8 @@
 "common.close" = "关闭";
 "common.done" = "完成";
 "credits.body" = "天体位置根据公开的轨道理论在设备上计算。银河图为示意插图，并非照片。";
-"frame.galaxy" = "银河中前进";
-"frame.sun" = "以太阳为中心";
+"frame.galaxy" = "银河";
+"frame.sun" = "太阳系";
 "galaxy.center" = "银河系中心（人马座A*）";
 "galaxy.direction" = "前进方向";
 "galaxy.facts" = "距中心约%@光年，绕行一周约需%@百万年。";

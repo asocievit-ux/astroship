@@ -59,8 +59,8 @@
 "common.close" = "Fechar";
 "common.done" = "OK";
 "credits.body" = "As posições são calculadas no aparelho a partir de teorias orbitais publicadas. O mapa da galáxia é uma ilustração, não uma fotografia.";
-"frame.galaxy" = "Viagem galáctica";
-"frame.sun" = "Centrado no Sol";
+"frame.galaxy" = "Galáxia";
+"frame.sun" = "Solar";
 "galaxy.center" = "Centro galáctico (Sgr A*)";
 "galaxy.direction" = "Direção do movimento";
 "galaxy.facts" = "A cerca de %@ anos-luz do centro. Uma volta leva cerca de %@ milhões de anos.";

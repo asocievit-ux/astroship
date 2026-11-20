@@ -84,6 +84,7 @@ final class AppModel: ObservableObject {
     func applyOpeningView() {
         mode = .galactic
         viewer.mode = .galactic
+        if !options.trails { options.trails = true }   // the opening view is all about the trails
         viewer.focus = .sun; focus = .sun
         viewer.distanceKm = Self.openingDistanceKm
         let (yaw, pitch) = Self.openingAngles()
@@ -92,16 +93,17 @@ final class AppModel: ObservableObject {
     }
 
     static let openingRate = 2_629_800.0          // 1 month per second
-    static let openingDistanceKm = 1.6e9          // about 11 AU
+    static let openingDistanceKm = 6.0e9          // about 40 AU: zoomed out so the planets' spirals show
 
-    /// Camera direction about 35 degrees off the Sun's direction of travel, tilted up a little.
+    /// Camera direction about 60 degrees off the Sun's direction of travel, tilted up a little:
+    /// the Sun's straight path crosses the screen and the planets' trails spiral around it.
     static func openingAngles() -> (Double, Double) {
         let v = normalize(Frames.eclToScene * GalacticMotion.velocityEcliptic)
         let up = SIMD3<Double>(0, 1, 0)
         var side = cross(v, up)
         if length(side) < 1e-6 { side = SIMD3<Double>(1, 0, 0) }
         side = normalize(side)
-        let a = 35.0 * .pi / 180
+        let a = 60.0 * .pi / 180
         var d = v * cos(a) + side * sin(a)
         d = normalize(d + up * 0.25)
         return (atan2(d.x, d.z), asin(max(-1, min(1, d.y))))

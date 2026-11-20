@@ -61,7 +61,8 @@ struct TopBar: View {
                 Text(L("frame.galaxy")).tag(FrameMode.galactic)
             }
             .pickerStyle(.segmented)
-            .frame(maxWidth: 210)
+            .fixedSize()
+            .layoutPriority(2)
             .padding(6)
             .glass()
             VStack(spacing: 8) {
@@ -96,13 +97,15 @@ struct TimeBar: View {
             Button { model.showPicker = true } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "scope")
-                    Text(model.focus.localizedName).lineLimit(1)
+                    Text(model.focus.localizedName).lineLimit(1).minimumScaleFactor(0.75)
                 }
+                .fixedSize(horizontal: true, vertical: false)
                 .font(.subheadline.weight(.semibold))
                 .padding(.horizontal, 12).frame(height: 44)
                 .contentShape(Rectangle())
             }
             .accessibilityIdentifier("bodyPickerButton")
+            .layoutPriority(2)
             .foregroundStyle(.white)
             .glass()
             Spacer(minLength: 2)
@@ -112,8 +115,8 @@ struct TimeBar: View {
                 ctl("forward.fill", L("time.faster")) { model.faster() }
                 Text(SpeedSteps.label(model.rate))
                     .font(.caption.monospacedDigit().weight(.semibold))
-                    .frame(minWidth: 52)
-                    .lineLimit(1).minimumScaleFactor(0.6)
+                    .frame(minWidth: 44)
+                    .lineLimit(1).minimumScaleFactor(0.5)
                     .padding(.trailing, model.isLive ? 10 : 0)
                 if !model.isLive {
                     Button { model.goLive() } label: {

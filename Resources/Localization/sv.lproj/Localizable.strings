@@ -59,8 +59,8 @@
 "common.close" = "Stäng";
 "common.done" = "Klar";
 "credits.body" = "Positionerna beräknas på enheten utifrån publicerade banteorier. Galaxkartan är en illustration, inte ett foto.";
-"frame.galaxy" = "Färd i galaxen";
-"frame.sun" = "Solcentrerad";
+"frame.galaxy" = "Galax";
+"frame.sun" = "Sol";
 "galaxy.center" = "Galaxens centrum (Sgr A*)";
 "galaxy.direction" = "Färdriktning";
 "galaxy.facts" = "Cirka %@ ljusår från centrum. Ett varv tar ungefär %@ miljoner år.";

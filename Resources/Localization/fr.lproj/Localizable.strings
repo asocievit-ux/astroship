@@ -59,8 +59,8 @@
 "common.close" = "Fermer";
 "common.done" = "OK";
 "credits.body" = "Les positions sont calculées sur l'appareil à partir de théories orbitales publiées. La carte de la galaxie est une illustration, pas une photo.";
-"frame.galaxy" = "Voyage galactique";
-"frame.sun" = "Centré sur le Soleil";
+"frame.galaxy" = "Galaxie";
+"frame.sun" = "Solaire";
 "galaxy.center" = "Centre galactique (Sgr A*)";
 "galaxy.direction" = "Sens du déplacement";
 "galaxy.facts" = "À environ %@ années-lumière du centre. Un tour prend environ %@ millions d'années.";
