@@ -8,6 +8,14 @@ on:
         description: "Runner label (macos-15, macos-26, macos-15-intel)"
         required: false
         default: macos-15
+      shots:
+        description: "iPhone shots (name or name@lang)"
+        required: false
+        default: "opening controls fast fasthelio tap picker controls@en"
+      ipad_shots:
+        description: "iPad shots (empty = skip iPad)"
+        required: false
+        default: "opening"
 permissions:
   contents: read
 concurrency:
@@ -65,37 +73,29 @@ jobs:
           " "$1"
           }
           shoot() {
-            UDID="$1"; TAG="$2"
+            UDID="$1"; TAG="$2"; LIST="$3"
             xcrun simctl boot "$UDID" || true
             xcrun simctl bootstatus "$UDID" -b
             xcrun simctl install "$UDID" "$APP"
             xcrun simctl status_bar "$UDID" override --time "9:41" --batteryState charged --batteryLevel 100 || true
-            for SHOT in opening controls fast fasthelio tap fly picker earth saturn inner galactic galaxy; do
+            for ITEM in $LIST; do
+              SHOT="${ITEM%%@*}"; LANGC="ja"; [ "$ITEM" != "$SHOT" ] && LANGC="${ITEM#*@}"
               xcrun simctl terminate "$UDID" com.aihasakuramoto22.solarmotion 2>/dev/null || true
-              xcrun simctl launch "$UDID" com.aihasakuramoto22.solarmotion -shot "$SHOT" -AppleLanguages "(ja)" -AppleLocale ja_JP
-              sleep 14
-              xcrun simctl io "$UDID" screenshot "$RUNNER_TEMP/shots/${TAG}-${SHOT}.png"
+              xcrun simctl launch "$UDID" com.aihasakuramoto22.solarmotion -shot "$SHOT" -AppleLanguages "($LANGC)"
+              sleep 11
+              NAME="${TAG}-${SHOT}"; [ "$LANGC" != "ja" ] && NAME="${NAME}-${LANGC}"
+              xcrun simctl io "$UDID" screenshot "$RUNNER_TEMP/shots/${NAME}.png"
             done
-            xcrun simctl terminate "$UDID" com.aihasakuramoto22.solarmotion 2>/dev/null || true
-            xcrun simctl launch "$UDID" com.aihasakuramoto22.solarmotion -shot earth -AppleLanguages "(en)" -AppleLocale en_US
-            sleep 12
-            xcrun simctl io "$UDID" screenshot "$RUNNER_TEMP/shots/${TAG}-earth-en.png"
-            xcrun simctl terminate "$UDID" com.aihasakuramoto22.solarmotion 2>/dev/null || true
-            xcrun simctl launch "$UDID" com.aihasakuramoto22.solarmotion -shot controls -AppleLanguages "(en)" -AppleLocale en_US
-            sleep 12
-            xcrun simctl io "$UDID" screenshot "$RUNNER_TEMP/shots/${TAG}-controls-en.png"
-            xcrun simctl terminate "$UDID" com.aihasakuramoto22.solarmotion 2>/dev/null || true
-            xcrun simctl launch "$UDID" com.aihasakuramoto22.solarmotion -shot galactic -AppleLanguages "(he)" -AppleLocale he_IL
-            sleep 12
-            xcrun simctl io "$UDID" screenshot "$RUNNER_TEMP/shots/${TAG}-galactic-he.png"
             xcrun simctl shutdown "$UDID" || true
           }
           IPHONE=$(pick 'iPhone .*Pro$')
           [ -n "$IPHONE" ] || IPHONE=$(pick 'iPhone')
-          shoot "$IPHONE" iphone
-          IPAD=$(pick 'iPad Pro.*13')
-          [ -n "$IPAD" ] || IPAD=$(pick 'iPad')
-          shoot "$IPAD" ipad
+          shoot "$IPHONE" iphone "${{ inputs.shots || 'opening controls fast fasthelio tap picker controls@en' }}"
+          if [ -n "${{ inputs.ipad_shots }}" ]; then
+            IPAD=$(pick 'iPad Pro.*13')
+            [ -n "$IPAD" ] || IPAD=$(pick 'iPad')
+            shoot "$IPAD" ipad "${{ inputs.ipad_shots }}"
+          fi
           ls -la "$RUNNER_TEMP/shots"
           # crash reports, if any
           ls ~/Library/Logs/DiagnosticReports/ 2>/dev/null | grep -i astro && head -120 ~/Library/Logs/DiagnosticReports/*Astro* || true
