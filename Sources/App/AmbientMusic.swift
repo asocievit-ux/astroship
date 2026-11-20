@@ -1,8 +1,8 @@
 import AVFoundation
 import Foundation
 
-/// Original 528 Hz ambient loop (Resources/Audio/ambient528.m4a, made by tools/make_music.py).
-/// Plays from launch at a modest volume. Session category .ambient: mixes with other audio and
+/// Background music: three Pixabay Content License tracks (Resources/Audio/bgm1-3.m4a, see
+/// docs/licenses.md) played in order as an endless gapless playlist. Plays from launch at a modest volume. Session category .ambient: mixes with other audio and
 /// respects the silent switch; the hardware volume buttons set the level. Pauses in the background.
 @MainActor
 final class AmbientMusic {
@@ -10,8 +10,8 @@ final class AmbientMusic {
 
     private let engine = AVAudioEngine()
     private let player = AVAudioPlayerNode()
-    // Streamed from disk (4-minute loop; too big to hold decoded). Two readers alternate so a queued
-    // pass never shares a file object with the one playing.
+    // Streamed from disk (16 minutes in total; far too big to hold decoded). The next track is always
+    // queued behind the playing one, so the playlist is gapless.
     private var files: [AVAudioFile] = []
     private var nextFile = 0
     private var file: AVAudioFile? { files.first }
@@ -35,10 +35,11 @@ final class AmbientMusic {
     private func configure() -> Bool {
         if configured { return file != nil }
         configured = true
-        guard let url = Bundle.main.url(forResource: "ambient528", withExtension: "m4a", subdirectory: "Audio"),
-              let f = try? AVAudioFile(forReading: url),
-              let f2 = try? AVAudioFile(forReading: url) else { return false }
-        files = [f, f2]
+        files = Self.playlist.compactMap { name in
+            Bundle.main.url(forResource: name, withExtension: "m4a", subdirectory: "Audio")
+                .flatMap { try? AVAudioFile(forReading: $0) }
+        }
+        guard let f = files.first else { return false }
         engine.attach(player)
         engine.connect(player, to: engine.mainMixerNode, format: f.processingFormat)
         player.volume = volume
@@ -78,7 +79,7 @@ final class AmbientMusic {
             if !player.isPlaying {
                 if !scheduled {
                     scheduled = true
-                    scheduleNext(); scheduleNext()   // keep one pass queued ahead -> gapless loop
+                    scheduleNext(); scheduleNext()   // playing track + the next one queued -> gapless
                 }
                 player.play()
             }
@@ -88,6 +89,7 @@ final class AmbientMusic {
     }
 
     private var scheduled = false
+    private static let playlist = ["bgm1", "bgm2", "bgm3"]
     private var generation = 0
 
     private func scheduleNext() {
