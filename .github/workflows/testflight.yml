@@ -4,6 +4,10 @@ name: TestFlight
 on:
   workflow_dispatch:
     inputs:
+      build_number:
+        description: "CFBundleVersion (must exceed the last uploaded build)"
+        required: false
+        default: ""
       runner:
         description: "Runner label (macos-15, macos-26, macos-15-intel)"
         required: false
@@ -80,7 +84,7 @@ jobs:
       - name: Archive
         run: |
           set -euo pipefail
-          VERSION="${{ github.run_number }}"
+          VERSION="${{ inputs.build_number || github.run_number }}"
           mkdir -p build
           set +e
           xcodebuild -project AstroShip.xcodeproj -scheme "$SCHEME" \
