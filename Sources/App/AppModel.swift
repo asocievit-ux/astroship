@@ -322,6 +322,14 @@ final class AppModel: ObservableObject {
             viewer.distanceKm = TourStop.all[i].distanceKm
             startTour(at: i)
             return
+        case "infoslow", "infofast":
+            // Info card for Earth at real time vs 10 years/s: the speeds must read the same.
+            viewer.focus = .earth; focus = .earth
+            mode = .heliocentric
+            setRate(name == "infofast" ? 315_576_000 : 1)
+            viewing = false
+            showInfo = true
+            return
         case "beltg", "belth":
             applyOpeningView()
             if name == "belth" { mode = .heliocentric }
