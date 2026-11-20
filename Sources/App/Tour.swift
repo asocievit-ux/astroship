@@ -28,7 +28,7 @@ enum TourStop: Equatable {
     /// Camera distance at arrival; the camera then eases in to `closeFactor` of it.
     var distanceKm: Double {
         switch self {
-        case .belt: return 1.25e9                                    // ~8 au: the whole belt
+        case .belt: return 1.9e9                                     // ~13 au: the whole belt
         case .body(let id): return ViewerState.defaultDistance(id) * 1.7
         }
     }
@@ -95,7 +95,7 @@ final class TourDirector {
         // Gentle orbit: a third of a turn per stop, slowly breathing elevation.
         let ease = smooth(t / Self.stopSeconds)
         model.viewer.yaw = yaw0 + 2 * .pi / 3 * ease
-        let basePitch = s == .belt ? 0.55 : 0.22
+        let basePitch = s == .belt ? 0.42 : 0.22
         model.viewer.pitch = basePitch + 0.12 * sin(t / Self.stopSeconds * 2 * .pi)
         if model.viewer.fly == nil {
             let k = smooth(max(0, t - Self.flySeconds) / (Self.stopSeconds - Self.flySeconds))

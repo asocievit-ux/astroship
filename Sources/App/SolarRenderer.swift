@@ -245,7 +245,7 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
             let m = b.m0 + b.n * d
             return b.rot * SIMD3<Float>(cos(m) * b.a * au, sin(m) * b.a * au, 0)
         }
-        beltNode.geometry = Geo.points(pts, size: 2, color: UIColor(white: 0.55, alpha: 1))
+        beltNode.geometry = Geo.points(pts, size: 2.6, color: UIColor(white: 0.72, alpha: 1))
     }
 
     // MARK: Orbits and trails
