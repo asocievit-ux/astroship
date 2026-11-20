@@ -15,8 +15,8 @@ struct SolarImmersiveView: View {
     var body: some View {
         RealityView { content in
             let root = Entity()
-            root.position = [0, 0.95, -1.25]        // in front of the viewer, below eye height
-            root.orientation = simd_quatf(angle: 0.25, axis: [1, 0, 0])
+            root.position = [0, 1.3, -1.05]         // in front of the viewer, just below eye height
+            root.orientation = simd_quatf(angle: 0.35, axis: [1, 0, 0])
             content.add(root)
             var made: [BodyID: Entity] = [:]
             for id in Self.ids {
@@ -45,7 +45,7 @@ struct SolarImmersiveView: View {
         let s = Frames.eclToScene * km
         let au = length(s) / Frames.au
         guard au > 1e-9 else { return .zero }
-        let r = 0.29 * sqrt(au)                  // metres
+        let r = 0.24 * sqrt(au)                  // metres
         let d = s / length(s) * r
         return SIMD3<Float>(Float(d.x), Float(d.y), Float(d.z))
     }
