@@ -2,11 +2,11 @@ import Foundation
 import QuartzCore
 import AstroCore
 
-/// Tour mode: a slow, calm, automatic camera journey from the Sun outwards. About two minutes at
+/// Tour mode: a slow, calm, automatic camera journey from the Sun outwards. About one minute at
 /// every stop (Sun, each planet, each major moon, the asteroid belt, Ceres / Vesta, dwarf planets,
 /// comets): a slow fly-in, then a gentle orbit with a slow push-in. All controls and cards are hidden
 /// (like viewing mode); the BGM keeps shuffling; a tap ends it. At the end it returns to the opening
-/// view. Heliocentric frame, time at one hour per second so moons and spins move gently.
+/// view (about one minute per stop, ~42 min in all). Heliocentric frame, time at one hour per second so moons and spins move gently.
 enum TourStop: Equatable {
     case body(BodyID)
     case belt
@@ -37,8 +37,8 @@ enum TourStop: Equatable {
 
 @MainActor
 final class TourDirector {
-    static let stopSeconds = 120.0
-    static let flySeconds = 12.0
+    static let stopSeconds = 60.0
+    static let flySeconds = 10.0
     private weak var model: AppModel?
     private var timer: Timer?
     private var index = 0
