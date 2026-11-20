@@ -8,6 +8,10 @@ on:
         description: "CFBundleVersion (must exceed the last uploaded build)"
         required: false
         default: ""
+      platform:
+        description: "ios or visionos"
+        required: false
+        default: ios
       runner:
         description: "Runner label (macos-15, macos-26, macos-15-intel)"
         required: false
@@ -25,7 +29,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: astroship-testflight
+  group: astroship-testflight-${{ inputs.platform || 'ios' }}
   cancel-in-progress: true
 jobs:
   sign:
@@ -35,7 +39,10 @@ jobs:
     env:
       TEAM_ID: 633T9MRH99
       BUNDLE_ID: com.aihasakuramoto22.solarmotion
-      SCHEME: AstroShip
+      SCHEME: ${{ inputs.platform == 'visionos' && 'AstroShipVision' || 'AstroShip' }}
+      SDK: ${{ inputs.platform == 'visionos' && 'xros' || 'iphoneos' }}
+      DEST: ${{ inputs.platform == 'visionos' && 'generic/platform=visionOS' || 'generic/platform=iOS' }}
+      ALTOOL_TYPE: ${{ inputs.platform == 'visionos' && 'visionos' || 'ios' }}
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode
@@ -88,7 +95,7 @@ jobs:
           mkdir -p build
           set +e
           xcodebuild -project AstroShip.xcodeproj -scheme "$SCHEME" \
-            -sdk iphoneos -destination 'generic/platform=iOS' -configuration Release \
+            -sdk "$SDK" -destination "$DEST" -configuration Release \
             -archivePath "$PWD/build/AstroShip.xcarchive" archive \
             DEVELOPMENT_TEAM="$TEAM_ID" PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
             CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Apple Distribution" \
@@ -145,7 +152,7 @@ jobs:
           PY
           chmod 600 "$KEY"
           set +e
-          xcrun altool --upload-app --type ios --file "$PWD/build/AstroShip.ipa" \
+          xcrun altool --upload-app --type "$ALTOOL_TYPE" --file "$PWD/build/AstroShip.ipa" \
             --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID" > "$RUNNER_TEMP/altool.out" 2>&1
           code=$?
           set -e
