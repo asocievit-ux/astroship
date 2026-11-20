@@ -176,7 +176,7 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
             orient.addChildNode(n)
         }
         if body.kind == .comet {
-            let tail = SCNNode(geometry: cometTailGeometry())
+            let tail = cometTailNode()
             tail.renderingOrder = 30
             tail.isHidden = true
             container.addChildNode(tail)
@@ -189,19 +189,45 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
         meshNodes.append(mesh)
     }
 
-    private func cometTailGeometry() -> SCNGeometry {
-        // Unit cone along +Y with its tip at the origin (the nucleus).
-        let cone = SCNCone(topRadius: 0.12, bottomRadius: 0.0, height: 1)
-        cone.radialSegmentCount = 24
-        let m = SCNMaterial()
-        m.lightingModel = .constant
-        m.diffuse.contents = UIColor(red: 0.45, green: 0.65, blue: 1.0, alpha: 1)
-        m.transparency = 0.28
-        m.blendMode = .add
-        m.writesToDepthBuffer = false
-        m.isDoubleSided = true
-        cone.firstMaterial = m
-        return cone
+    /// Comet tail along +Y from the nucleus at the origin (unit length; scaled per frame): a narrow blue
+    /// ion tail and a wider, slightly curved, warm dust tail, each three crossed additive sprites that
+    /// fade with distance from the nucleus and towards their edges, plus a small soft coma.
+    private func cometTailNode() -> SCNNode {
+        let root = SCNNode()
+        func sprite(_ tex: String, width: CGFloat, height: CGFloat) -> SCNNode {
+            let n = SCNNode()
+            for k in 0..<3 {
+                let plane = SCNPlane(width: width, height: height)
+                let m = SCNMaterial()
+                m.lightingModel = .constant
+                m.diffuse.contents = Geo.texture(tex)
+                m.blendMode = .add
+                m.writesToDepthBuffer = false
+                m.isDoubleSided = true
+                plane.firstMaterial = m
+                let p = SCNNode(geometry: plane)
+                p.position = SCNVector3(0, Float(height) / 2, 0)
+                p.eulerAngles.y = Float(k) * .pi / 3
+                n.addChildNode(p)
+            }
+            return n
+        }
+        let ion = sprite("comet_ion.png", width: 0.09, height: 1.0)
+        root.addChildNode(ion)
+        let dust = sprite("comet_dust.png", width: 0.22, height: 0.7)
+        dust.eulerAngles.z = 0.22          // dust lags behind the orbit: a gentle offset from the ion tail
+        root.addChildNode(dust)
+        let coma = SCNPlane(width: 0.014, height: 0.014)
+        let cm = SCNMaterial()
+        cm.lightingModel = .constant
+        cm.diffuse.contents = Geo.texture("comet_coma.png")
+        cm.blendMode = .add
+        cm.writesToDepthBuffer = false
+        coma.firstMaterial = cm
+        let comaNode = SCNNode(geometry: coma)
+        comaNode.constraints = [SCNBillboardConstraint()]
+        root.addChildNode(comaNode)
+        return root
     }
 
     private func buildMotionArrow() {
@@ -499,7 +525,7 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
             let away = normalize(Frames.eclToScene * p)
             tail.simdOrientation = simd_quatf(from: SIMD3<Float>(0, 1, 0), to: SIMD3<Float>(Float(away.x), Float(away.y), Float(away.z)))
             tail.simdScale = SIMD3<Float>(Float(len), Float(len), Float(len))
-            tail.simdPosition = SIMD3<Float>(Float(away.x), Float(away.y), Float(away.z)) * Float(len / 2)
+            tail.simdPosition = .zero          // the tail starts at the nucleus
         }
 
         let items = LabelLayout.compute(renderer: self, state: st, cameraPos: camPos, options: options, focus: state.focus)

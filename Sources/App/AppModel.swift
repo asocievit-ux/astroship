@@ -323,6 +323,24 @@ final class AppModel: ObservableObject {
             viewer.distanceKm = TourStop.all[i].distanceKm
             startTour(at: i)
             return
+        case "comet", "cometgal":
+            // Comet Encke at its next perihelion (searched day by day), paused, tail in view.
+            var best = viewer.clock.jd, bestR = Double.infinity
+            for d in stride(from: 0.0, through: 1_300, by: 1) {
+                let jd = viewer.clock.jd + d
+                let r = length(Ephemeris.position(.encke, jd: jd))
+                if r < bestR { bestR = r; best = jd }
+            }
+            viewer.clock.set(jd: best)
+            setRate(0)
+            mode = name == "cometgal" ? .galactic : .heliocentric
+            options.orbits = false
+            viewer.focus = name == "cometgal" ? .sun : .encke; focus = viewer.focus
+            viewer.distanceKm = name == "cometgal" ? 4.0e8 : 9.0e7
+            viewer.yaw = 1.2; viewer.pitch = 0.35
+            viewing = true
+            showInfo = false
+            return
         case "infoslow", "infofast":
             // Info card for Earth at real time vs 10 years/s: the speeds must read the same.
             viewer.focus = .earth; focus = .earth
