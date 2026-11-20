@@ -13,7 +13,7 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section(L("settings.display")) {
-                    Toggle(L("settings.music"), isOn: $musicOn)
+                    Toggle(isOn: $musicOn) { Label(L("settings.music"), systemImage: "music.note") }
                         .onChange(of: musicOn) { _, on in AmbientMusic.shared.setEnabled(on) }
                     Picker(selection: $sleepTimer.minutes) {
                         ForEach(SleepTimer.choices, id: \.self) { m in
@@ -21,7 +21,7 @@ struct SettingsView: View {
                         }
                     } label: {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(L("sleep.title"))
+                            Label(L("sleep.title"), systemImage: "timer")
                             if sleepTimer.endDate != nil {
                                 TimelineView(.periodic(from: .now, by: 1)) { ctx in
                                     Text(L("sleep.remaining", sleepTimer.remainingText(now: ctx.date) ?? ""))
