@@ -64,6 +64,8 @@ final class AppModel: ObservableObject {
     private let openedAt = Date()
     private var rateBeforePause: Double = 1
     private(set) var interacted = false
+    /// Screenshot runs only: show SceneKit's fps / frame-time statistics.
+    private(set) var debugStats = false
 
     init() {
         if let m = FrameMode(rawValue: UserDefaults.standard.integer(forKey: "frameMode")) { mode = m }
@@ -231,6 +233,18 @@ final class AppModel: ObservableObject {
                     handleTap(at: CGPoint(x: m.point.x + 18, y: m.point.y - 10))
                 }
             }
+        case "fast":
+            // Max speed (10 years/s) in the opening view, with SceneKit's fps counter on screen.
+            applyOpeningView()
+            setRate(SpeedSteps.values.last!)
+            debugStats = true
+            return
+        case "fasthelio":
+            viewer.focus = .sun; focus = .sun
+            viewer.distanceKm = 7.0e9; viewer.yaw = 0.4; viewer.pitch = 0.9
+            mode = .heliocentric
+            setRate(SpeedSteps.values.last!)
+            debugStats = true
         case "picker":
             showPicker = true
         case "fly":

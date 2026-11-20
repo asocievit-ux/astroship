@@ -22,8 +22,18 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
     private var meshNodes: [SCNNode] = []       // per body, scaled mesh
     private var orbitNodes: [BodyID: SCNNode] = [:]
     private var trailNodes: [BodyID: SCNNode] = [:]
-    private var trailBuiltJD: [BodyID: Double] = [:]
-    private var trailRoundRobin = 0
+    private struct TrailCache {
+        var h: Double
+        var points: [Int: V3] = [:]
+        var builtLast = Int.min
+        var anchorJD = 0.0
+        var color = SIMD3<Float>(1, 1, 1)
+        init(h: Double) { self.h = h }
+    }
+    private var trailCache: [BodyID: TrailCache] = [:]
+    private var trailHeads: [BodyID: SCNNode] = [:]
+    private var headColor: [BodyID: SIMD3<Float>] = [:]
+    private var orbitBuiltAt: [BodyID: Double] = [:]
     private let sunTrailNode = SCNNode()
     private let motionArrow = SCNNode()
     private let beltNode = SCNNode()
@@ -31,7 +41,6 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
     private var beltBuiltJD = -1.0
     private var cometTails: [BodyID: SCNNode] = [:]
     private var sunGlow = SCNNode()
-    private var orbitBuiltJD = -1e9
     private var lastMode: FrameMode?
     weak var view: SCNView?
     /// Called on the main queue ~4x per second with the latest ephemeris (for the info panel).
@@ -251,9 +260,18 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
         }
     }
 
+    /// Orbit ellipses barely change, so they are rebuilt only when stale (the Moon's every few days,
+    /// fixed-ellipse satellites never, the rest every ten years) — never all of them every frame.
+    private func orbitRefreshDays(_ b: Body) -> Double {
+        if b.id == .moon { return 3 }
+        if b.kind == .moon { return .infinity }
+        return 3_652
+    }
+
     private func rebuildOrbits(jd: Double) {
-        orbitBuiltJD = jd
         for body in Catalog.all where body.kind != .star {
+            if let t = orbitBuiltAt[body.id], abs(jd - t) < orbitRefreshDays(body) { continue }
+            orbitBuiltAt[body.id] = jd
             let pts = Ephemeris.orbitPolyline(body.id, jd: jd, count: body.kind == .comet ? 720 : 360)
             let f = pts.map { $0.sceneUnits }
             let c = SIMD3<Float>(Float(body.color.0), Float(body.color.1), Float(body.color.2)) * (body.kind == .moon ? 0.35 : 0.45)
@@ -261,6 +279,15 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
             let node = lineNode(&orbitNodes, body.id, order: 5)
             node.geometry = g
         }
+    }
+
+    private func trailHead(_ id: BodyID) -> SCNNode {
+        if let n = trailHeads[id] { return n }
+        let n = SCNNode()
+        n.renderingOrder = 6
+        scene.rootNode.addChildNode(n)
+        trailHeads[id] = n
+        return n
     }
 
     private func lineNode(_ dict: inout [BodyID: SCNNode], _ id: BodyID, order: Int) -> SCNNode {
@@ -284,36 +311,74 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
     private static let trailBodies: [BodyID] = [.mercury, .venus, .earth, .moon, .mars, .jupiter, .saturn, .uranus, .neptune,
                                                 .pluto, .ceres, .eris, .haumea, .makemake, .halley, .encke, .swiftTuttle]
 
+    /// Galactic-frame trails, smooth at every speed:
+    /// - samples sit on a fixed time grid (multiples of `h`), so the curve never "swims" when rebuilt;
+    /// - heliocentric sample positions are cached, so only new grid points are computed each frame;
+    /// - the strip is rebuilt whenever a grid point is added (every frame at high speed, no round-robin cap);
+    /// - a short head segment joins the last grid point to the body's exact position every frame.
     private func updateTrails(jd: Double, sunRel: SIMD3<Float>, options: DisplayOptions, show: Bool) {
-        let v = GalacticMotion.velocityEcliptic
-        var rebuilt = 0
-        for k in 0..<Self.trailBodies.count {
-            let id = Self.trailBodies[(k + trailRoundRobin) % Self.trailBodies.count]
+        let vKmPerDay = GalacticMotion.velocityEcliptic * 86_400
+        for id in Self.trailBodies {
             let body = Catalog.body(id)
             let node = lineNode(&trailNodes, id, order: 6)
+            let head = trailHead(id)
             let on = show && visible(body, options)
             node.isHidden = !on
+            head.isHidden = !on
             guard on else { continue }
             let dur = trailDuration(id)
-            let built = trailBuiltJD[id]
-            let samples = body.kind == .comet ? 900 : (id == .moon ? 240 : 480)
-            if built == nil || abs(jd - built!) > dur / Double(samples) * 1.5, rebuilt < 3 {
-                rebuilt += 1
-                trailBuiltJD[id] = jd
-                let pts = GalacticMotion.trail(id, endJD: jd, durationDays: dur, samples: samples)
+            let samples = body.kind == .comet ? 1200 : (id == .moon ? 360 : 720)
+            let h = dur / Double(samples)
+            let last = Int((jd / h).rounded(.down))
+            let first = last - samples + 1
+            var cache = trailCache[id] ?? TrailCache(h: h)
+            if cache.h != h { cache = TrailCache(h: h) }
+            if cache.builtLast != last || node.geometry == nil {
+                // drop old grid points, compute only the missing ones
+                cache.points = cache.points.filter { $0.key >= first && $0.key <= last }
+                var pts: [SIMD3<Float>] = []
+                pts.reserveCapacity(samples)
+                for i in first...last {
+                    let t = Double(i) * h
+                    let helio: V3
+                    if let c = cache.points[i] { helio = c } else {
+                        helio = Ephemeris.position(id, jd: t)
+                        cache.points[i] = helio
+                    }
+                    pts.append((helio + vKmPerDay * (t - jd)).sceneUnits)
+                }
                 let base = SIMD3<Float>(Float(body.color.0), Float(body.color.1), Float(body.color.2))
                 let n = pts.count
-                let colors = (0..<n).map { i -> SIMD3<Float> in
+                var colors = [SIMD3<Float>](); colors.reserveCapacity(n)
+                for i in 0..<n {
                     let t = Float(i) / Float(max(n - 1, 1))
-                    return base * (0.08 + 0.92 * t * t)
+                    colors.append(base * (0.08 + 0.92 * t * t))
                 }
-                node.geometry = Geo.lineStrip(pts.map { $0.sceneUnits }, colors: colors, closed: false)
+                node.geometry = Geo.lineStrip(pts, colors: colors, closed: false)
+                cache.builtLast = last
+                cache.anchorJD = jd
+                cache.color = base
+                trailCache[id] = cache
             }
-            // Positions are relative to the Sun at the build time; the Sun has moved since.
-            let shift = (v * ((jd - (trailBuiltJD[id] ?? jd)) * -86_400)).sceneUnits
-            node.simdPosition = sunRel + shift
+            // Vertices are relative to the Sun at anchorJD; the Sun has moved since.
+            node.simdPosition = sunRel + (vKmPerDay * (cache.anchorJD - jd)).sceneUnits
+            // Head: last grid point -> exact current position (relative to the current Sun).
+            let tLast = Double(last) * h
+            let pLast = (cache.points[last] ?? Ephemeris.position(id, jd: tLast)) + vKmPerDay * (tLast - jd)
+            let pNow = Ephemeris.position(id, jd: jd)
+            let a = pLast.sceneUnits, b = pNow.sceneUnits
+            let d = b - a
+            let len = simd_length(d)
+            if len > 0 {
+                head.simdPosition = sunRel + a
+                head.simdOrientation = simd_quatf(from: SIMD3<Float>(1, 0, 0), to: d / len)
+                head.simdScale = SIMD3<Float>(repeating: len)
+                if head.geometry == nil || headColor[id] != cache.color {
+                    headColor[id] = cache.color
+                    head.geometry = Geo.lineStrip([.zero, SIMD3<Float>(1, 0, 0)], colors: [cache.color, cache.color], closed: false)
+                }
+            }
         }
-        trailRoundRobin = (trailRoundRobin + 1) % Self.trailBodies.count
 
         // The Sun's own straight path and its direction of travel.
         sunTrailNode.isHidden = !show
@@ -387,8 +452,8 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
         sunGlow.simdScale = SIMD3<Float>(repeating: Float(glowSize))
 
         // Orbits / trails / belt
-        if mode != lastMode { lastMode = mode; trailBuiltJD.removeAll() }
-        if abs(jd - orbitBuiltJD) > 20 { rebuildOrbits(jd: jd) }
+        if mode != lastMode { lastMode = mode; trailCache.removeAll() }
+        rebuildOrbits(jd: jd)
         let showOrbits = options.orbits && mode == .heliocentric
         for (id, node) in orbitNodes {
             let body = Catalog.body(id)

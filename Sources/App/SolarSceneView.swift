@@ -31,6 +31,7 @@ struct SolarSceneView: UIViewRepresentable {
         v.antialiasingMode = .multisampling4X
         v.backgroundColor = .black
         v.rendersContinuously = true
+        v.showsStatistics = model.debugStats
         r.view = v
         let c = context.coordinator
         let pan = UIPanGestureRecognizer(target: c, action: #selector(Coordinator.pan(_:)))
