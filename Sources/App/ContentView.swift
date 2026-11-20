@@ -112,15 +112,20 @@ struct TimeBar: View {
                 ctl("forward.fill", L("time.faster")) { model.faster() }
                 Text(SpeedSteps.label(model.rate))
                     .font(.caption.monospacedDigit().weight(.semibold))
-                    .frame(minWidth: 64)
+                    .frame(minWidth: 52)
                     .lineLimit(1).minimumScaleFactor(0.6)
-                Button { model.goLive() } label: {
-                    Text(L("time.now")).font(.caption.weight(.bold))
-                        .padding(.horizontal, 10).frame(height: 30)
-                        .background(model.isLive ? Color.white.opacity(0.12) : Color.accentColor, in: Capsule())
+                    .padding(.trailing, model.isLive ? 10 : 0)
+                if !model.isLive {
+                    Button { model.goLive() } label: {
+                        Text(L("time.now")).font(.caption.weight(.bold))
+                            .lineLimit(1).fixedSize()
+                            .padding(.horizontal, 10).frame(height: 30)
+                            .background(Color.accentColor, in: Capsule())
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.trailing, 6)
+                    .layoutPriority(1)
                 }
-                .foregroundStyle(.white)
-                .padding(.trailing, 6)
             }
             .glass()
         }
@@ -129,7 +134,7 @@ struct TimeBar: View {
 
     private func ctl(_ name: String, _ label: String, _ action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Image(systemName: name).font(.system(size: 16, weight: .semibold)).frame(width: 40, height: 44)
+            Image(systemName: name).font(.system(size: 16, weight: .semibold)).frame(width: 38, height: 44)
         }
         .foregroundStyle(.white)
         .accessibilityLabel(label)
