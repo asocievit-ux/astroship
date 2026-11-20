@@ -147,3 +147,4 @@
 "unit.lightSeconds" = "ljus: %@ s";
 "unit.years" = "%@ år";
 "view.mode" = "Visningsläge";
+"vision.immersive" = "Immersivt solsystem";

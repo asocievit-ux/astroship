@@ -29,6 +29,9 @@ struct AstroShipApp: App {
                     await AppOpenCoordinator.shared.onColdStart(store: store, model: model)
                 }
         }
+        #if os(visionOS)
+        .defaultSize(width: 1280, height: 820)
+        #endif
         .onChange(of: scenePhase) { _, phase in
             switch phase {
             case .active:
@@ -41,5 +44,13 @@ struct AstroShipApp: App {
             default: break
             }
         }
+        #if os(visionOS)
+        ImmersiveSpace(id: "orrery") {
+            SolarImmersiveView()
+                .environmentObject(model)
+                .onDisappear { model.immersiveOpen = false }
+        }
+        .immersionStyle(selection: .constant(.mixed), in: .mixed)
+        #endif
     }
 }

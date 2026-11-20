@@ -44,6 +44,10 @@ final class AppModel: ObservableObject {
     }()
 
     @Published var dateText = ""
+    /// visionOS: the immersive orrery is open.
+    @Published var immersiveOpen = false
+    /// Screenshot run that should open the immersive space on launch (visionOS).
+    private(set) var immersiveShot = false
     @Published var isLive = true
     @Published var rate: Double = 1
     @Published var paused = false
@@ -276,6 +280,10 @@ final class AppModel: ObservableObject {
         case "galaxy":
             showGalaxy = true
         case "opening":
+            applyOpeningView()
+            return
+        case "immersive":
+            immersiveShot = true
             applyOpeningView()
             return
         case "tap":

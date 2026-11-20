@@ -16,6 +16,14 @@ on:
         description: "iPad shots (empty = skip iPad)"
         required: false
         default: "opening"
+      iphone_re:
+        description: "iPhone simulator name regex"
+        required: false
+        default: "iPhone .*Pro$"
+      vision_shots:
+        description: "Apple Vision Pro shots (empty = skip visionOS)"
+        required: false
+        default: ""
 permissions:
   contents: read
 concurrency:
@@ -88,7 +96,7 @@ jobs:
             done
             xcrun simctl shutdown "$UDID" || true
           }
-          IPHONE=$(pick 'iPhone .*Pro$')
+          IPHONE=$(pick '${{ inputs.iphone_re || 'iPhone .*Pro$' }}')
           [ -n "$IPHONE" ] || IPHONE=$(pick 'iPhone')
           shoot "$IPHONE" iphone "${{ inputs.shots || 'opening controls fast fasthelio tap picker controls@en' }}"
           if [ -n "${{ inputs.ipad_shots }}" ]; then
@@ -102,5 +110,75 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: screenshots
+          path: ${{ runner.temp }}/shots
+          retention-days: 7
+
+  vision:
+    if: inputs.vision_shots != ''
+    runs-on: ${{ inputs.runner || 'macos-15' }}
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: |
+          set -euo pipefail
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1 || true)
+          [ -n "$X" ] || X=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          sudo xcode-select -s "$X"
+          xcodebuild -version
+          xcrun simctl list runtimes | grep -i -E "vision|xr" || true
+      - name: visionOS runtime
+        run: |
+          if ! xcrun simctl list runtimes | grep -qi visionos; then
+            xcodebuild -downloadPlatform visionOS 2>&1 | tail -5
+          fi
+          xcrun simctl list runtimes | grep -i visionos
+          xcrun simctl list devices available | grep -i vision || true
+      - name: Generate project
+        run: brew install xcodegen && xcodegen generate
+      - name: Build for visionOS simulator
+        run: |
+          set -euo pipefail
+          set +e
+          xcodebuild -project AstroShip.xcodeproj -scheme AstroShipVision -configuration Debug \
+            -sdk xrsimulator -destination 'generic/platform=visionOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/dd" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build > "$RUNNER_TEMP/build.log" 2>&1
+          code=$?
+          set -e
+          grep -E "error:|warning:.*Sources/" "$RUNNER_TEMP/build.log" | sort -u | head -150 || true
+          tail -5 "$RUNNER_TEMP/build.log"
+          exit $code
+      - name: Screenshots
+        run: |
+          set -euo pipefail
+          APP=$(find "$RUNNER_TEMP/dd/Build/Products" -name 'AstroShip.app' -path '*xrsimulator*' | head -1)
+          mkdir -p "$RUNNER_TEMP/shots"
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)['devices']
+          print(next((x['udid'] for rt,v in d.items() if 'xrOS' in rt or 'visionOS' in rt for x in v if 'Vision' in x['name']), ''))")
+          if [ -z "$UDID" ]; then
+            RT=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; print([r['identifier'] for r in json.load(sys.stdin)['runtimes'] if 'xrOS' in r['identifier'] or 'visionOS' in r['identifier']][-1])")
+            UDID=$(xcrun simctl create "Apple Vision Pro" "com.apple.CoreSimulator.SimDeviceType.Apple-Vision-Pro" "$RT")
+          fi
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          sleep 20
+          xcrun simctl install "$UDID" "$APP"
+          for ITEM in ${{ inputs.vision_shots }}; do
+            SHOT="${ITEM%%@*}"; LANGC="ja"; [ "$ITEM" != "$SHOT" ] && LANGC="${ITEM#*@}"
+            xcrun simctl terminate "$UDID" com.aihasakuramoto22.solarmotion 2>/dev/null || true
+            sleep 2
+            xcrun simctl launch "$UDID" com.aihasakuramoto22.solarmotion -shot "$SHOT" -AppleLanguages "($LANGC)"
+            sleep 18
+            NAME="vision-${SHOT}"; [ "$LANGC" != "ja" ] && NAME="${NAME}-${LANGC}"
+            xcrun simctl io "$UDID" screenshot "$RUNNER_TEMP/shots/${NAME}.png"
+          done
+          ls -la "$RUNNER_TEMP/shots"
+          ls ~/Library/Logs/DiagnosticReports/ 2>/dev/null | grep -i astro && head -120 ~/Library/Logs/DiagnosticReports/*Astro* || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vision-screenshots
           path: ${{ runner.temp }}/shots
           retention-days: 7

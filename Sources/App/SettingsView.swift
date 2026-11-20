@@ -60,7 +60,9 @@ struct SettingsView: View {
                 Section {
                     Text(L("settings.scaleNote")).font(.footnote).foregroundStyle(.secondary)
                 }
+                #if !os(visionOS)
                 PurchaseSection()
+                #endif
                 Section(L("settings.about")) {
                     NavigationLink(L("settings.credits")) { CreditsView() }
                     if store.privacyOptionsRequired {

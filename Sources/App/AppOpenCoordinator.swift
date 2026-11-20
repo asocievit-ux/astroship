@@ -1,5 +1,7 @@
 import simd
 import Foundation
+#if canImport(GoogleMobileAds)
+import AppTrackingTransparency
 import GoogleMobileAds
 import UIKit
 import UserMessagingPlatform
@@ -62,6 +64,12 @@ final class AppOpenCoordinator: NSObject, FullScreenContentDelegate {
             }
         }
         store?.consentUpdated()
+        // App Tracking Transparency after the UMP message (Google's recommended order). Declining only
+        // means non-personalised ads; the app works the same.
+        if UMPConsentInformation.sharedInstance.canRequestAds,
+           ATTrackingManager.trackingAuthorizationStatus == .notDetermined {
+            _ = await ATTrackingManager.requestTrackingAuthorization()
+        }
         return UMPConsentInformation.sharedInstance.canRequestAds
     }
 
@@ -82,3 +90,11 @@ final class AppOpenCoordinator: NSObject, FullScreenContentDelegate {
         self.ad = nil
     }
 }
+#else
+/// visionOS: no ads SDK, so nothing happens on launch.
+@MainActor
+final class AppOpenCoordinator {
+    static let shared = AppOpenCoordinator()
+    func onColdStart(store: RemoveAdsStore, model: AppModel) async {}
+}
+#endif

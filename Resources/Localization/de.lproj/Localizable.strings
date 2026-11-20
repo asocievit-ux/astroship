@@ -147,3 +147,4 @@
 "unit.lightSeconds" = "Licht: %@ s";
 "unit.years" = "%@ Jahre";
 "view.mode" = "Betrachtungsmodus";
+"vision.immersive" = "Immersives Sonnensystem";

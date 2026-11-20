@@ -26,10 +26,15 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: model.viewing)
+        #if os(iOS)
         .statusBarHidden(model.viewing)
+        #endif
         .persistentSystemOverlays(model.viewing ? .hidden : .automatic)
         .background(Color.black)
         .preferredColorScheme(.dark)
+        #if os(visionOS)
+        .modifier(ImmersiveShotOpener())
+        #endif
         .sheet(isPresented: $model.showPicker) { BodyPicker().environmentObject(model).appLanguage(lang).id(lang.code) }
         .sheet(isPresented: $model.showSettings) {
             SettingsView().environmentObject(model).environmentObject(store).environmentObject(SleepTimer.shared)
@@ -80,6 +85,9 @@ struct TopBar: View {
                     RocketGlyph().frame(width: 34, height: 34).contentShape(Rectangle())
                 }
                 .accessibilityLabel(L("tour.start"))
+                #if os(visionOS)
+                ImmersiveToggle()
+                #endif
                 IconButton(system: "hurricane", label: L("galaxy.title"), embedded: true) { model.showGalaxy = true }
                 IconButton(system: "gearshape", label: L("settings.title"), embedded: true) { model.showSettings = true }
             }

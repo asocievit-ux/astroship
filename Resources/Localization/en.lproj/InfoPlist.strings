@@ -1,2 +1,3 @@
 "CFBundleDisplayName" = "AstroShip";
 "CFBundleName" = "AstroShip";
+"NSUserTrackingUsageDescription" = "Your choice lets AstroShip show ads that are more relevant to you. The app works the same either way.";

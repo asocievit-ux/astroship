@@ -2,7 +2,9 @@ import simd
 import Foundation
 import StoreKit
 import UIKit
+#if canImport(UserMessagingPlatform)
 import UserMessagingPlatform
+#endif
 
 /// One-time non-consumable "Remove Ads". Configured in code; App Store Connect must have the same product ID.
 @MainActor
@@ -143,7 +145,11 @@ final class RemoveAdsStore: ObservableObject {
 @MainActor
 enum ConsentPresenter {
     static var optionsRequired: Bool {
+        #if canImport(UserMessagingPlatform)
         UMPConsentInformation.sharedInstance.privacyOptionsRequirementStatus == .required
+        #else
+        false
+        #endif
     }
     static var rootViewController: UIViewController? {
         let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
@@ -154,7 +160,9 @@ enum ConsentPresenter {
         return top
     }
     static func presentPrivacyOptions() {
+        #if canImport(UserMessagingPlatform)
         guard let root = rootViewController else { return }
         UMPConsentForm.presentPrivacyOptionsForm(from: root) { _ in }
+        #endif
     }
 }
