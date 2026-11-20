@@ -13,8 +13,8 @@
 | Galaxy top view, sun glow, star sprite, app icon | Generated procedurally by `tools/build_assets.py` / icon script | Own work |
 
 ## Background music
-Played as an endless playlist in shuffled order (reshuffled every cycle, no back-to-back repeats). Re-encoded to AAC 128 kbps, 44.1 kHz stereo; files `Resources/Audio/bgm1-8.m4a`. Every audio file in `Resources/Audio` is picked up automatically — add one with `tools/add_bgm.sh` and list it here.
-All eight are used under the **Pixabay Content License** — summary: https://pixabay.com/service/license-summary/
+Played as an endless playlist in shuffled order (reshuffled every cycle, no back-to-back repeats). Re-encoded to AAC 128 kbps, 44.1 kHz stereo; files `Resources/Audio/bgm1-9.m4a`. Every audio file in `Resources/Audio` is picked up automatically — add one with `tools/add_bgm.sh` and list it here.
+All nine are used under the **Pixabay Content License** — summary: https://pixabay.com/service/license-summary/
 
 | # | File | Title | Creator (Pixabay) | Pixabay page | Length |
 |---|------|-------|-------------------|--------------|--------|
@@ -26,8 +26,9 @@ All eight are used under the **Pixabay Content License** — summary: https://pi
 | 6 | bgm6.m4a | Sweet Dreams 528 Hz Short | Siarhei_Korbut | https://pixabay.com/ja/music/瞑想-精神的な-sweet-dreams-528-hz-short-377543/ | 3:45 |
 | 7 | bgm7.m4a | Angels Lullaby 528 Hz (Short) | Siarhei_Korbut | https://pixabay.com/ja/music/瞑想-精神的な-angels-lullaby-528-hz-short-391382/ | 3:25 |
 | 8 | bgm8.m4a | 528 Hz Solar Plexus Chakra Healing | Roman_Sol | https://pixabay.com/ja/music/瞑想-精神的な-528-hz-solar-plexus-chakra-healing-553028/ | 3:15 |
+| 9 | bgm9.m4a | あなたはちゃんと守られるから、安心してね。 (Japanese female vocals) | KI-chorus (yuiko @ki+chorus) | https://pixabay.com/ja/music/合唱団-あなたはちゃんと守られるから安心してね-140690/ | 3:28 |
 
 Notes:
-- Tracks 1, 4, 5, 6, 7 and 8 are registered with YouTube Content ID by their creators (a claim can appear on videos that contain it; this does not affect use inside the app).
+- Tracks 1, 4, 5, 6, 7 and 8 are registered with YouTube Content ID by their creators (a claim can appear on videos that contain them; this does not affect use inside the app). Track 9 is not registered with Content ID.
 - Page URLs are built from the Pixabay track IDs in the original file names (Pixabay resolves `/music/<slug>-<id>/`); verify in a browser before publishing.
 - Pixabay tracks must not be redistributed as standalone audio files; here they are only embedded in the app.
