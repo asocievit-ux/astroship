@@ -19,8 +19,8 @@ struct ContentView: View {
                     if model.showInfo, let info = model.info { InfoCard(info: info) }
                     TimeBar()
                 }
-                .padding(.horizontal, 12)
-                .padding(.bottom, 8)
+                .padding(.horizontal, 22)   // keep the bars well inside the rounded screen corners
+                .padding(.bottom, 12)
                 .id(lang.code)
                 .transition(.opacity)
             }
@@ -77,7 +77,7 @@ struct TopBar: View {
                 ModeToggle(embedded: true)
                 Rectangle().fill(Color.white.opacity(0.25)).frame(width: 1, height: 22).padding(.horizontal, 3)
                 Button { model.startTour() } label: {
-                    RocketGlyph().frame(width: 38, height: 36).contentShape(Rectangle())
+                    RocketGlyph().frame(width: 34, height: 34).contentShape(Rectangle())
                 }
                 .accessibilityLabel(L("tour.start"))
                 IconButton(system: "hurricane", label: L("galaxy.title"), embedded: true) { model.showGalaxy = true }
@@ -87,7 +87,7 @@ struct TopBar: View {
             .glass()
             .layoutPriority(1)
         }
-        .padding(.top, 4)
+        .padding(.top, 6)
     }
 }
 
@@ -109,7 +109,7 @@ struct ModeToggle: View {
                 if let icon { Image(systemName: icon).font(.system(size: 16, weight: .regular)) }
                 else { SaturnGlyph(ring: on ? Color.black : Color.white.opacity(0.9)) }
             }
-                .frame(width: 40, height: 36)
+                .frame(width: 36, height: 34)
                 .foregroundStyle(on ? Color.black : Color.white)
                 .background(on ? Color.white.opacity(0.9) : Color.clear, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
@@ -174,7 +174,7 @@ struct IconButton: View {
     var body: some View {
         let b = Button(action: action) {
             Image(systemName: system).font(.system(size: 17, weight: embedded ? .regular : .semibold))
-                .frame(width: embedded ? 38 : 42, height: embedded ? 36 : 42)
+                .frame(width: embedded ? 34 : 40, height: embedded ? 34 : 40)
                 .foregroundStyle(.white)
         }
         .accessibilityLabel(label)
@@ -190,7 +190,7 @@ struct TimeBar: View {
             Button { model.showPicker = true } label: {
                 Image(systemName: "list.bullet.circle.fill")
                     .font(.system(size: 20, weight: .semibold))
-                    .frame(width: 48, height: 44)
+                    .frame(width: 44, height: 40)
                     .contentShape(Rectangle())
             }
             .accessibilityIdentifier("bodyPickerButton")
@@ -226,7 +226,7 @@ struct TimeBar: View {
             Button { model.viewing = true } label: {
                 Image(systemName: "eye")
                     .font(.system(size: 18, weight: .regular))
-                    .frame(width: 48, height: 44)
+                    .frame(width: 44, height: 40)
                     .contentShape(Rectangle())
             }
             .accessibilityLabel(L("view.mode"))
