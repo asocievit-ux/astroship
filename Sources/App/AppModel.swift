@@ -99,14 +99,14 @@ final class AppModel: ObservableObject {
     }
 
     static let openingRate = 2_629_800.0          // 1 month per second
-    static let openingDistanceKm = 1.2e10         // about 80 AU: trails stream across the screen
+    static let openingDistanceKm = 2.0e10         // about 130 AU: trails stream across the screen
 
-    /// The camera looks at the Sun towards galactic longitude 11 deg, latitude +14 deg, so the bright
+    /// The camera looks at the Sun towards galactic longitude 14 deg, latitude +24 deg (matches the user's reference framing), so the bright
     /// Milky Way core with its dust lanes sits in the lower left behind the Sun and the Sun's path and
     /// the planets' trails run diagonally across the screen. The Sun is the focus (floating origin), so
     /// the camera keeps homing on it as it moves.
     static func openingAngles() -> (Double, Double) {
-        let l = 11.0 * .pi / 180, b = 14.0 * .pi / 180
+        let l = 14.0 * .pi / 180, b = 24.0 * .pi / 180
         let g = SIMD3<Double>(cos(b) * cos(l), cos(b) * sin(l), sin(b))
         let view = normalize(Frames.eclToScene * (Frames.galToEcl * g))   // camera -> Sun
         let d = -view                                                    // Sun -> camera

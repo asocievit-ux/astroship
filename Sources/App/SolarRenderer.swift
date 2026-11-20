@@ -482,8 +482,9 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
             let s = Float(max(sunDist * 0.18, 2e5))
             motionArrow.simdScale = SIMD3<Float>(s, s, s)
         }
-        beltNode.isHidden = !options.belt
-        if options.belt {
+        // From far away (> 40 AU) the belt would read as a ring around the Sun: hide it there.
+        beltNode.isHidden = !options.belt || sunDist > 6.0e6
+        if !beltNode.isHidden {
             beltNode.simdPosition = sunRel
             updateBelt(jd: jd)
         }
