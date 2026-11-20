@@ -141,11 +141,18 @@ final class AppModel: ObservableObject {
 
     // MARK: Tour
 
+    private var optionsBeforeTour: DisplayOptions?
+
     func startTour(at index: Int = 0) {
         viewing = true           // hide every bar and card, like viewing mode
         showInfo = false
         touring = true
         tour.start(at: index)
+        // A clean sky for the tour: no orbit lines / trails (restored afterwards).
+        optionsBeforeTour = options
+        options.orbits = false
+        options.trails = false
+        options.belt = true
     }
 
     /// A tap (or the sleep timer) ends the tour. Finished tours return to the opening view.
@@ -153,6 +160,7 @@ final class AppModel: ObservableObject {
         guard touring else { return }
         tour.stop()
         touring = false
+        if let o = optionsBeforeTour { options = o; optionsBeforeTour = nil }
         if finished {
             applyOpeningView()
         } else {
@@ -313,6 +321,13 @@ final class AppModel: ObservableObject {
             viewer.focus = TourStop.all[i].focus; focus = viewer.focus
             viewer.distanceKm = TourStop.all[i].distanceKm
             startTour(at: i)
+            return
+        case "beltg", "belth":
+            applyOpeningView()
+            if name == "belth" { mode = .heliocentric }
+            options.orbits = false
+            viewer.distanceKm = 1.25e9; viewer.pitch = 0.6
+            setRate(3_600)
             return
         case "settingshelio":
             applyOpeningView()

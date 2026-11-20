@@ -72,7 +72,7 @@ struct TopBar: View {
             HStack(spacing: 2) {
                 ModeToggle(embedded: true)
                 Rectangle().fill(Color.white.opacity(0.25)).frame(width: 1, height: 22).padding(.horizontal, 3)
-                IconButton(system: "airplane", label: L("tour.start"), embedded: true) { model.startTour() }
+                IconButton(system: "point.topleft.down.to.point.bottomright.curvepath", label: L("tour.start"), embedded: true) { model.startTour() }
                 IconButton(system: "gearshape", label: L("settings.title"), embedded: true) { model.showSettings = true }
                 IconButton(system: "hurricane", label: L("galaxy.title"), embedded: true) { model.showGalaxy = true }
                 Button { model.viewing = true } label: {
