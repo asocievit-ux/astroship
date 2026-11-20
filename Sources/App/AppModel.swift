@@ -263,6 +263,12 @@ final class AppModel: ObservableObject {
             applyOpeningView()
             viewing = false
             return
+        case "settings":
+            applyOpeningView()
+            viewing = false
+            SleepTimer.shared.minutes = 30
+            showSettings = true
+            return
         case "picker":
             showPicker = true
         case "fly":
