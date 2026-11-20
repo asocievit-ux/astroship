@@ -45,7 +45,7 @@ final class AmbientMusic {
         return true
     }
 
-    static let enabledKey = "music.enabled"
+    nonisolated static let enabledKey = "music.enabled"
     /// Settings switch (persisted, default on).
     static var enabled: Bool {
         UserDefaults.standard.object(forKey: enabledKey) as? Bool ?? true
