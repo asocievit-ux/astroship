@@ -4,6 +4,10 @@ name: TestFlight
 on:
   workflow_dispatch:
     inputs:
+      runner:
+        description: "Runner label (macos-15, macos-26, macos-15-intel)"
+        required: false
+        default: macos-15
       sign_archive:
         description: "Type YES to run the macOS signing job."
         required: true
@@ -22,7 +26,7 @@ concurrency:
 jobs:
   sign:
     if: inputs.sign_archive == 'YES'
-    runs-on: macos-15
+    runs-on: ${{ inputs.runner || 'macos-15' }}
     timeout-minutes: 60
     env:
       TEAM_ID: 633T9MRH99
