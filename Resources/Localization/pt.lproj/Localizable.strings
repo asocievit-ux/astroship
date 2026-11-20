@@ -103,6 +103,10 @@
 "settings.title" = "Ajustes";
 "settings.trails" = "Rastros em hélice (viagem galáctica)";
 "settings.version" = "Versão";
+"sleep.minutes" = "%@ min";
+"sleep.off" = "Desligado";
+"sleep.remaining" = "Para em %@";
+"sleep.title" = "Timer de sono";
 "speed.dayPerSec" = "1 dia/s";
 "speed.decadePerSec" = "10 anos/s";
 "speed.hourPerSec" = "1 hora/s";

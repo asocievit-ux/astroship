@@ -7,6 +7,7 @@ struct SettingsView: View {
     @EnvironmentObject var store: RemoveAdsStore
     @Environment(\.dismiss) private var dismiss
     @AppStorage(AmbientMusic.enabledKey) private var musicOn = true
+    @EnvironmentObject var sleepTimer: SleepTimer
 
     var body: some View {
         NavigationStack {
@@ -14,6 +15,21 @@ struct SettingsView: View {
                 Section(L("settings.display")) {
                     Toggle(L("settings.music"), isOn: $musicOn)
                         .onChange(of: musicOn) { _, on in AmbientMusic.shared.setEnabled(on) }
+                    Picker(selection: $sleepTimer.minutes) {
+                        ForEach(SleepTimer.choices, id: \.self) { m in
+                            Text(m == 0 ? L("sleep.off") : L("sleep.minutes", Fmt.number(Double(m), digits: 0))).tag(m)
+                        }
+                    } label: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(L("sleep.title"))
+                            if sleepTimer.endDate != nil {
+                                TimelineView(.periodic(from: .now, by: 1)) { ctx in
+                                    Text(L("sleep.remaining", sleepTimer.remainingText(now: ctx.date) ?? ""))
+                                        .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
                     Toggle(L("settings.orbits"), isOn: $model.options.orbits)
                     Toggle(L("settings.trails"), isOn: $model.options.trails)
                     Toggle(L("settings.moons"), isOn: $model.options.moons)

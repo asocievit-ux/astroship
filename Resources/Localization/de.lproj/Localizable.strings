@@ -103,6 +103,10 @@
 "settings.title" = "Einstellungen";
 "settings.trails" = "Schraubenspuren (Reise durch die Galaxis)";
 "settings.version" = "Version";
+"sleep.minutes" = "%@ Min.";
+"sleep.off" = "Aus";
+"sleep.remaining" = "Stopp in %@";
+"sleep.title" = "Schlaftimer";
 "speed.dayPerSec" = "1 Tag/s";
 "speed.decadePerSec" = "10 Jahre/s";
 "speed.hourPerSec" = "1 Std./s";

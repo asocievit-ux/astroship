@@ -30,7 +30,7 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
         .sheet(isPresented: $model.showPicker) { BodyPicker().environmentObject(model) }
         .sheet(isPresented: $model.showSettings) {
-            SettingsView().environmentObject(model).environmentObject(store)
+            SettingsView().environmentObject(model).environmentObject(store).environmentObject(SleepTimer.shared)
         }
         .fullScreenCover(isPresented: $model.showGalaxy) { GalaxyScreen().environmentObject(model) }
     }

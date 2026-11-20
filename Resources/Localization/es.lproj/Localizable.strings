@@ -103,6 +103,10 @@
 "settings.title" = "Ajustes";
 "settings.trails" = "Estelas en hélice (viaje galáctico)";
 "settings.version" = "Versión";
+"sleep.minutes" = "%@ min";
+"sleep.off" = "Desactivado";
+"sleep.remaining" = "Se detiene en %@";
+"sleep.title" = "Temporizador de sueño";
 "speed.dayPerSec" = "1 día/s";
 "speed.decadePerSec" = "10 años/s";
 "speed.hourPerSec" = "1 hora/s";

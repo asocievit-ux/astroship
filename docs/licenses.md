@@ -13,8 +13,8 @@
 | Galaxy top view, sun glow, star sprite, app icon | Generated procedurally by `tools/build_assets.py` / icon script | Own work |
 
 ## Background music
-Played as an endless playlist in shuffled order (reshuffled every cycle, no back-to-back repeats). Re-encoded to AAC 128 kbps, 44.1 kHz stereo; files `Resources/Audio/bgm1-12.m4a` (track 10 resampled from 48 kHz). Every audio file in `Resources/Audio` is picked up automatically — add one with `tools/add_bgm.sh` and list it here.
-All twelve are used under the **Pixabay Content License** — summary: https://pixabay.com/service/license-summary/
+Played as an endless playlist in shuffled order (reshuffled every cycle, no back-to-back repeats). Re-encoded to AAC 128 kbps, 44.1 kHz stereo; files `Resources/Audio/bgm1-13.m4a` (track 10 resampled from 48 kHz). Every audio file in `Resources/Audio` is picked up automatically — add one with `tools/add_bgm.sh` and list it here.
+All thirteen are used under the **Pixabay Content License** — summary: https://pixabay.com/service/license-summary/
 
 | # | File | Title | Creator (Pixabay) | Pixabay page | Length |
 |---|------|-------|-------------------|--------------|--------|
@@ -30,8 +30,9 @@ All twelve are used under the **Pixabay Content License** — summary: https://p
 | 10 | bgm10.m4a | 528 Hz Résonance Solaire Arcturienne | C-STyLe-Background | https://pixabay.com/music/ambient-alien528-hz-résonance-solaire-arcturiennealien-474194/ | 3:48 |
 | 11 | bgm11.m4a | 639 Hz Harmonie du cœur arcturien | C-STyLe-Background | https://pixabay.com/ja/music/アンビエント-エイリアン-639-hzharmonie-du-cœur-arcturien-エイリアン-559028/ | 3:49 |
 | 12 | bgm12.m4a | 528 Hz Angelic Choir Meditation 2 | Megis-music (Ura Megis) | https://pixabay.com/ja/music/瞑想-精神的な-528-hz-angelic-choir-meditation-2-605957/ | 3:19 |
+| 13 | bgm13.m4a | 963Hz Énergie Arcturienne | C-STyLe-Background | https://pixabay.com/music/ambient-alien963hz-énergie-arcturiennealien-463699/ | 3:24 |
 
 Notes:
-- Tracks 1, 4, 5, 6, 7, 8 and 12 are registered with YouTube Content ID by their creators (a claim can appear on videos that contain them; this does not affect use inside the app). Tracks 9, 10 and 11 are not registered with Content ID.
+- Tracks 1, 4, 5, 6, 7, 8 and 12 are registered with YouTube Content ID by their creators (a claim can appear on videos that contain them; this does not affect use inside the app). Tracks 9, 10, 11 and 13 are not registered with Content ID.
 - Page URLs are built from the Pixabay track IDs in the original file names (Pixabay resolves `/music/<slug>-<id>/`); verify in a browser before publishing.
 - Pixabay tracks must not be redistributed as standalone audio files; here they are only embedded in the app.

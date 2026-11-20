@@ -103,6 +103,10 @@
 "settings.title" = "Réglages";
 "settings.trails" = "Traînées en hélice (voyage galactique)";
 "settings.version" = "Version";
+"sleep.minutes" = "%@ min";
+"sleep.off" = "Désactivé";
+"sleep.remaining" = "Arrêt dans %@";
+"sleep.title" = "Minuterie de sommeil";
 "speed.dayPerSec" = "1 jour/s";
 "speed.decadePerSec" = "10 ans/s";
 "speed.hourPerSec" = "1 h/s";

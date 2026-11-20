@@ -75,6 +75,7 @@ struct SolarSceneView: UIViewRepresentable {
 
         @objc func tap(_ g: UITapGestureRecognizer) {
             model.noteInteraction()
+            if SleepTimer.shared.asleep { SleepTimer.shared.wake(); return }   // sleeping: a tap only wakes up
             if model.viewing { model.viewing = false; return }   // viewing mode: a tap only restores the controls
             guard let v = g.view as? SCNView else { return }
             let p = g.location(in: v)

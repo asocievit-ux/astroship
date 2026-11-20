@@ -103,6 +103,10 @@
 "settings.title" = "Inställningar";
 "settings.trails" = "Spiralspår (färd i galaxen)";
 "settings.version" = "Version";
+"sleep.minutes" = "%@ min";
+"sleep.off" = "Av";
+"sleep.remaining" = "Stoppar om %@";
+"sleep.title" = "Insomningstimer";
 "speed.dayPerSec" = "1 dag/s";
 "speed.decadePerSec" = "10 år/s";
 "speed.hourPerSec" = "1 tim/s";

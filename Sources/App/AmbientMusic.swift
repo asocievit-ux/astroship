@@ -69,9 +69,36 @@ final class AmbientMusic {
     }
 
     func start() {
-        guard Self.enabled else { return }
+        guard Self.enabled, !SleepTimer.shared.asleep else { return }
+        fadeTimer?.invalidate(); fadeTimer = nil
+        player.volume = volume
         wantsPlay = true
         resumeIfWanted()
+    }
+
+    private var fadeTimer: Timer?
+
+    /// Sleep timer: ramp the volume down, then stop (the Settings switch is left as it is).
+    func fadeOutAndStop(seconds: Double) {
+        guard wantsPlay else { return }
+        fadeTimer?.invalidate()
+        fadeStep = 0
+        fadeTimer = Timer.scheduledTimer(withTimeInterval: seconds / Double(Self.fadeSteps), repeats: true) { _ in
+            Task { @MainActor in AmbientMusic.shared.fadeTick() }
+        }
+    }
+
+    private static let fadeSteps = 40
+    private var fadeStep = 0
+
+    private func fadeTick() {
+        fadeStep += 1
+        player.volume = volume * Float(max(0, 1 - Double(fadeStep) / Double(Self.fadeSteps)))
+        if fadeStep >= Self.fadeSteps {
+            fadeTimer?.invalidate(); fadeTimer = nil
+            pause()
+            player.volume = volume
+        }
     }
 
     func pause() {

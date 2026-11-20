@@ -103,6 +103,10 @@
 "settings.title" = "設定";
 "settings.trails" = "らせんの軌跡（銀河を進む）";
 "settings.version" = "バージョン";
+"sleep.minutes" = "%@分";
+"sleep.off" = "オフ";
+"sleep.remaining" = "残り %@";
+"sleep.title" = "スリープタイマー";
 "speed.dayPerSec" = "1日/秒";
 "speed.decadePerSec" = "10年/秒";
 "speed.hourPerSec" = "1時間/秒";

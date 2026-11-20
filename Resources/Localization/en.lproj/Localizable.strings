@@ -103,6 +103,10 @@
 "settings.title" = "Settings";
 "settings.trails" = "Helix trails (galactic motion)";
 "settings.version" = "Version";
+"sleep.minutes" = "%@ min";
+"sleep.off" = "Off";
+"sleep.remaining" = "Stops in %@";
+"sleep.title" = "Sleep timer";
 "speed.dayPerSec" = "1 day/s";
 "speed.decadePerSec" = "10 years/s";
 "speed.hourPerSec" = "1 hour/s";

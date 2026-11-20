@@ -103,6 +103,10 @@
 "settings.title" = "הגדרות";
 "settings.trails" = "שובלי סליל (מסע בגלקסיה)";
 "settings.version" = "גרסה";
+"sleep.minutes" = "%@ דק׳";
+"sleep.off" = "כבוי";
+"sleep.remaining" = "נעצר בעוד %@";
+"sleep.title" = "טיימר שינה";
 "speed.dayPerSec" = "יום/שנ׳";
 "speed.decadePerSec" = "עשור/שנ׳";
 "speed.hourPerSec" = "שעה/שנ׳";

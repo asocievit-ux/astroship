@@ -113,6 +113,14 @@ final class AppModel: ObservableObject {
         return (atan2(d.x, d.z), asin(max(-1, min(1, d.y))))
     }
 
+    /// Sleep timer: stop / restart SceneKit rendering (the simulated clock keeps its own time).
+    func setRendering(_ on: Bool) {
+        guard let v = renderer.view else { return }
+        v.isPlaying = on
+        v.rendersContinuously = on
+        if on { v.preferredFramesPerSecond = 60 }
+    }
+
     /// Tap on the 3D view: nearest body within a generous hit area. Returns false if nothing is near.
     @discardableResult
     func handleTap(at p: CGPoint) -> Bool {
