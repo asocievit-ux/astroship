@@ -15,7 +15,7 @@ struct SolarImmersiveView: View {
     var body: some View {
         RealityView { content in
             let root = Entity()
-            root.position = [0, 1.1, -1.9]          // in front of the viewer, below eye height
+            root.position = [0, 0.95, -1.25]        // in front of the viewer, below eye height
             root.orientation = simd_quatf(angle: 0.25, axis: [1, 0, 0])
             content.add(root)
             var made: [BodyID: Entity] = [:]
@@ -79,10 +79,13 @@ struct SolarImmersiveView: View {
 
     static func texture(_ name: String) -> TextureResource? {
         let parts = name.split(separator: ".")
-        guard parts.count == 2,
-              let url = Bundle.main.url(forResource: String(parts[0]), withExtension: String(parts[1]), subdirectory: "Textures")
-        else { return nil }
-        return try? TextureResource.load(contentsOf: url)
+        let base = String(parts[0])
+        let exts = parts.count == 2 ? [String(parts[1])] : ["jpg", "png"]
+        for ext in exts {
+            if let url = Bundle.main.url(forResource: base, withExtension: ext, subdirectory: "Textures"),
+               let t = try? TextureResource.load(contentsOf: url) { return t }
+        }
+        return nil
     }
 
     static func sphere(for id: BodyID) -> Entity {
@@ -91,8 +94,8 @@ struct SolarImmersiveView: View {
         let tex = body.texture.flatMap { texture($0) }
         let e: ModelEntity
         if id == .sun {
-            var m = UnlitMaterial(color: .white)
-            if let t = tex { m.color = .init(tint: .white, texture: .init(t)) }
+            var m = UnlitMaterial(color: UIColor(red: 1, green: 0.78, blue: 0.4, alpha: 1))
+            if let t = tex { m.color = .init(tint: UIColor(red: 1, green: 0.93, blue: 0.8, alpha: 1), texture: .init(t)) }
             e = ModelEntity(mesh: mesh, materials: [m])
         } else {
             var m = PhysicallyBasedMaterial()
