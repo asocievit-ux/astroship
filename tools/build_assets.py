@@ -48,6 +48,9 @@ def sky_texture(w=4096, h=2048):
     img *= np.clip((88.5 - np.abs(b)) / 3.0, 0, 1)[..., None]
     # Dim and lift the black point so stars from the catalogue carry the sharp points.
     img = np.clip((img - 0.02) * 0.8, 0, 1) ** 1.05
+    # v3: lift the faint band (~2x in the midtones) so the Milky Way reads clearly behind the opening view
+    k = 2.6
+    img = np.clip((1 - np.exp(-k * img)) / (1 - np.exp(-k)), 0, 1)
     Image.fromarray((img * 255).astype(np.uint8)).save(OUT / "Textures/sky_milkyway.jpg", quality=86)
     return pano
 
