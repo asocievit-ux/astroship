@@ -99,7 +99,7 @@
 "settings.moons" = "衛星";
 "settings.music" = "音楽（528Hz）";
 "settings.orbits" = "軌道（太陽中心）";
-"settings.scaleNote" = "大きさも距離も本物の比率です。惑星は間の空間に比べてとても小さいので、光る輪で位置を示しています。名前をタップすると近くまで飛べます。";
+"settings.scaleNote" = "大きさも距離も本物の比率なので、惑星は間の空間に比べてとても小さく見えます。天体の近くをタップするか、一覧から選ぶと近くまで飛べます。";
 "settings.title" = "設定";
 "settings.trails" = "らせんの軌跡（銀河を進む）";
 "settings.version" = "バージョン";

@@ -99,7 +99,7 @@
 "settings.moons" = "Månar";
 "settings.music" = "Musik (528 Hz)";
 "settings.orbits" = "Banor (solcentrerad)";
-"settings.scaleNote" = "Storlekar och avstånd är skalenliga. Planeterna är små jämfört med rymden mellan dem, så lysande ringar visar var de är. Tryck på ett namn för att flyga dit.";
+"settings.scaleNote" = "Storlekar och avstånd är skalenliga, så planeterna är små jämfört med rymden mellan dem. Tryck nära en himlakropp eller välj den i listan för att flyga dit.";
 "settings.title" = "Inställningar";
 "settings.trails" = "Spiralspår (färd i galaxen)";
 "settings.version" = "Version";

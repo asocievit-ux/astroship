@@ -99,7 +99,7 @@
 "settings.moons" = "Satélites";
 "settings.music" = "Música (528 Hz)";
 "settings.orbits" = "Órbitas (centrado en el Sol)";
-"settings.scaleNote" = "Tamaños y distancias están a escala real. Los planetas son diminutos frente al espacio entre ellos, por eso los anillos luminosos marcan dónde están. Toca un nombre para volar allí.";
+"settings.scaleNote" = "Tamaños y distancias están a escala real, así que los planetas son diminutos frente al espacio entre ellos. Toca cerca de un astro o elígelo en la lista para volar allí.";
 "settings.title" = "Ajustes";
 "settings.trails" = "Estelas en hélice (viaje galáctico)";
 "settings.version" = "Versión";

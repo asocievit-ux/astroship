@@ -13,21 +13,29 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section(L("settings.display")) {
-                    Toggle(isOn: $musicOn) { Label(L("settings.music"), systemImage: "music.note") }
+                    Toggle(isOn: $musicOn) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "music.note").foregroundStyle(.secondary).frame(width: 22)
+                            Text(L("settings.music"))
+                        }
+                    }
                         .onChange(of: musicOn) { _, on in AmbientMusic.shared.setEnabled(on) }
                     Picker(selection: $sleepTimer.minutes) {
                         ForEach(SleepTimer.choices, id: \.self) { m in
                             Text(m == 0 ? L("sleep.off") : L("sleep.minutes", Fmt.number(Double(m), digits: 0))).tag(m)
                         }
                     } label: {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Label(L("sleep.title"), systemImage: "timer")
+                        HStack(spacing: 12) {
+                          Image(systemName: "timer").foregroundStyle(.secondary).frame(width: 22)
+                          VStack(alignment: .leading, spacing: 2) {
+                            Text(L("sleep.title"))
                             if sleepTimer.endDate != nil {
                                 TimelineView(.periodic(from: .now, by: 1)) { ctx in
                                     Text(L("sleep.remaining", sleepTimer.remainingText(now: ctx.date) ?? ""))
                                         .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                                 }
                             }
+                          }
                         }
                     }
                     Toggle(L("settings.orbits"), isOn: $model.options.orbits)

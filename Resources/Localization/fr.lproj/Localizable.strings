@@ -99,7 +99,7 @@
 "settings.moons" = "Satellites";
 "settings.music" = "Musique (528 Hz)";
 "settings.orbits" = "Orbites (centré Soleil)";
-"settings.scaleNote" = "Tailles et distances sont à l'échelle réelle. Les planètes sont minuscules face à l'espace qui les sépare : des anneaux lumineux indiquent leur position. Touchez un nom pour y aller.";
+"settings.scaleNote" = "Tailles et distances sont à l'échelle réelle : les planètes sont minuscules face à l'espace qui les sépare. Touchez près d'un astre ou choisissez-le dans la liste pour y aller.";
 "settings.title" = "Réglages";
 "settings.trails" = "Traînées en hélice (voyage galactique)";
 "settings.version" = "Version";

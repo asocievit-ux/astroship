@@ -99,7 +99,7 @@
 "settings.moons" = "卫星";
 "settings.music" = "音乐（528Hz）";
 "settings.orbits" = "轨道（以太阳为中心）";
-"settings.scaleNote" = "大小和距离都按真实比例。行星相对于它们之间的空间非常小，所以用发光的圆环标出位置。点按名称即可飞过去。";
+"settings.scaleNote" = "大小和距离都按真实比例，所以行星相对于它们之间的空间非常小。点按天体附近或从列表中选择，即可飞过去。";
 "settings.title" = "设置";
 "settings.trails" = "螺旋轨迹（银河中前进）";
 "settings.version" = "版本";

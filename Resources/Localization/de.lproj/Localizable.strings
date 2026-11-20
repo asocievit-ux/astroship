@@ -99,7 +99,7 @@
 "settings.moons" = "Monde";
 "settings.music" = "Musik (528 Hz)";
 "settings.orbits" = "Bahnen (sonnenzentriert)";
-"settings.scaleNote" = "Größen und Entfernungen sind maßstabsgetreu. Planeten sind winzig im Vergleich zum Raum dazwischen, daher markieren leuchtende Ringe ihre Position. Tippe auf einen Namen, um hinzufliegen.";
+"settings.scaleNote" = "Größen und Entfernungen sind maßstabsgetreu, daher sind Planeten winzig im Vergleich zum Raum dazwischen. Tippe in die Nähe eines Himmelskörpers oder wähle ihn in der Liste, um hinzufliegen.";
 "settings.title" = "Einstellungen";
 "settings.trails" = "Schraubenspuren (Reise durch die Galaxis)";
 "settings.version" = "Version";
