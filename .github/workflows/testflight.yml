@@ -1,0 +1,152 @@
+# Manual only. Signed archive for App Store Connect, optional internal TestFlight upload.
+# Never submits for review.
+name: TestFlight
+on:
+  workflow_dispatch:
+    inputs:
+      sign_archive:
+        description: "Type YES to run the macOS signing job."
+        required: true
+        default: "NO"
+        type: string
+      upload_testflight:
+        description: "Type YES to upload to TestFlight (internal) after signing. Needs the App Store Connect app record."
+        required: true
+        default: "NO"
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: astroship-testflight
+  cancel-in-progress: true
+jobs:
+  sign:
+    if: inputs.sign_archive == 'YES'
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      TEAM_ID: 633T9MRH99
+      BUNDLE_ID: com.aihasakuramoto22.solarmotion
+      SCHEME: AstroShip
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: |
+          set -euo pipefail
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1 || true)
+          [ -n "$X" ] || { ls /Applications; exit 1; }
+          sudo xcode-select -s "$X"
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+      - name: Generate project
+        run: brew install xcodegen && xcodegen generate
+      - name: Install certificate and profile
+        env:
+          P12_B64: ${{ secrets.APPLE_DISTRIBUTION_P12 }}
+          P12_PASS: ${{ secrets.APPLE_DISTRIBUTION_P12_PASSWORD }}
+          PROFILE_B64: ${{ secrets.APPLE_APPSTORE_PROFILE }}
+        run: |
+          set +x
+          umask 077
+          TMP=$(mktemp -d)
+          python3 - "$TMP" << 'PY'
+          import base64, os, pathlib, sys
+          tmp = pathlib.Path(sys.argv[1])
+          (tmp / "cert.p12").write_bytes(base64.b64decode(os.environ["P12_B64"], validate=True))
+          (tmp / "app.mobileprovision").write_bytes(base64.b64decode(os.environ["PROFILE_B64"], validate=True))
+          PY
+          KC="$RUNNER_TEMP/astro.keychain"
+          KC_PASS=$(openssl rand -hex 16)
+          security create-keychain -p "$KC_PASS" "$KC"
+          security default-keychain -s "$KC"
+          security unlock-keychain -p "$KC_PASS" "$KC"
+          security set-keychain-settings -lut 900 "$KC"
+          security import "$TMP/cert.p12" -k "$KC" -P "$P12_PASS" -T /usr/bin/codesign -T /usr/bin/security >/dev/null
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KC_PASS" "$KC" >/dev/null
+          security cms -D -i "$TMP/app.mobileprovision" -o "$TMP/profile.plist" >/dev/null
+          UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$TMP/profile.plist")
+          NAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' "$TMP/profile.plist")
+          APPID=$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$TMP/profile.plist")
+          if [ "$APPID" != "$TEAM_ID.$BUNDLE_ID" ]; then echo "Profile App ID mismatch: $APPID"; exit 1; fi
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp "$TMP/app.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"
+          rm -rf "$TMP"
+          echo "PROFILE_NAME=$NAME" >> "$GITHUB_ENV"
+          echo "KEYCHAIN_PATH=$KC" >> "$GITHUB_ENV"
+      - name: Archive
+        run: |
+          set -euo pipefail
+          VERSION="${{ github.run_number }}"
+          mkdir -p build
+          set +e
+          xcodebuild -project AstroShip.xcodeproj -scheme "$SCHEME" \
+            -sdk iphoneos -destination 'generic/platform=iOS' -configuration Release \
+            -archivePath "$PWD/build/AstroShip.xcarchive" archive \
+            DEVELOPMENT_TEAM="$TEAM_ID" PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
+            CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Apple Distribution" \
+            CURRENT_PROJECT_VERSION="$VERSION" PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" > "$RUNNER_TEMP/archive.log" 2>&1
+          code=$?
+          set -e
+          grep -E "error:" "$RUNNER_TEMP/archive.log" | sort -u | head -80 || true
+          tail -15 "$RUNNER_TEMP/archive.log"
+          test "$code" = "0"
+          PL="build/AstroShip.xcarchive/Products/Applications/AstroShip.app/Info.plist"
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$PL"
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$PL"
+      - name: Export IPA
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/ExportOptions.plist" << EOF2
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>destination</key><string>export</string>
+            <key>provisioningProfiles</key><dict>
+              <key>${BUNDLE_ID}</key><string>${PROFILE_NAME}</string>
+            </dict>
+          </dict></plist>
+          EOF2
+          xcodebuild -exportArchive -archivePath "$PWD/build/AstroShip.xcarchive" \
+            -exportPath "$PWD/build/export" -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+          cp build/export/*.ipa build/AstroShip.ipa
+          ls -la build/AstroShip.ipa
+      - name: Upload to TestFlight
+        if: inputs.upload_testflight == 'YES'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          set +x
+          umask 077
+          DIR="$HOME/.appstoreconnect/private_keys"
+          mkdir -p "$DIR"
+          KEY="$DIR/AuthKey_${ASC_KEY_ID}.p8"
+          python3 - "$KEY" <<'PY'
+          import os, pathlib, re, sys
+          raw = os.environ["ASC_PRIVATE_KEY"].replace("\\n", "\n").strip()
+          m = re.search(r"-----BEGIN ([^-]+)-----(.*)-----END \1-----", raw, re.S)
+          if not m:
+              raise SystemExit("ASC_PRIVATE_KEY is not a PEM private key")
+          label, body = m.group(1), re.sub(r"\s+", "", m.group(2))
+          lines = [body[i:i+64] for i in range(0, len(body), 64)]
+          pathlib.Path(sys.argv[1]).write_text(f"-----BEGIN {label}-----\n" + "\n".join(lines) + f"\n-----END {label}-----\n")
+          PY
+          chmod 600 "$KEY"
+          set +e
+          xcrun altool --upload-app --type ios --file "$PWD/build/AstroShip.ipa" \
+            --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID" > "$RUNNER_TEMP/altool.out" 2>&1
+          code=$?
+          set -e
+          rm -f "$KEY"
+          grep -vE "PRIVATE KEY|AuthKey_" "$RUNNER_TEMP/altool.out" | tail -40
+          if [ "$code" != "0" ] || grep -qE "ERROR:|Failed to upload|ENTITY_ERROR" "$RUNNER_TEMP/altool.out"; then exit 1; fi
+          grep -qE "No errors uploading|UPLOAD SUCCEEDED" "$RUNNER_TEMP/altool.out"
+      - name: Remove signing material
+        if: always()
+        run: |
+          if [ -n "${KEYCHAIN_PATH:-}" ]; then security delete-keychain "$KEYCHAIN_PATH" >/dev/null 2>&1 || true; fi
+          rm -rf "$HOME/.appstoreconnect" "$HOME/Library/MobileDevice/Provisioning Profiles" build

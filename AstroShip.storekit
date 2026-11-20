@@ -1,0 +1,20 @@
+{
+  "identifier" : "ASTROSHIP_LOCAL",
+  "nonRenewingSubscriptions" : [ ],
+  "products" : [
+    {
+      "displayPrice" : "400",
+      "familyShareable" : false,
+      "internalID" : "ASTRO_REMOVEADS_LOCAL",
+      "localizations" : [
+        { "description" : "起動時の広告を表示しません（ローカルテスト用）。", "displayName" : "広告を非表示", "locale" : "ja_JP" }
+      ],
+      "productID" : "com.aihasakuramoto22.astroship.removeads",
+      "referenceName" : "Remove Ads local test",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : { "_locale" : "ja_JP", "_storefront" : "JPN" },
+  "subscriptionGroups" : [ ],
+  "version" : { "major" : 4, "minor" : 0 }
+}
