@@ -136,6 +136,7 @@
 "time.play" = "再生";
 "time.simulated" = "シミュレーション";
 "time.slower" = "遅く・逆再生";
+"tour.start" = "ツアー";
 "unit.au" = "%@ 天文単位";
 "unit.days" = "%@ 日";
 "unit.hours" = "%@ 時間";

@@ -49,6 +49,9 @@ targets:
       - path: Resources/Audio
         type: folder
         buildPhase: resources
+      - path: Resources/Thumbs
+        type: folder
+        buildPhase: resources
     info:
       path: Generated/AstroShip-Info.plist
       properties:

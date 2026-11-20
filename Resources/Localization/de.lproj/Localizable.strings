@@ -136,6 +136,7 @@
 "time.play" = "Abspielen";
 "time.simulated" = "SIMULATION";
 "time.slower" = "Langsamer / rückwärts";
+"tour.start" = "Rundflug";
 "unit.au" = "%@ AE";
 "unit.days" = "%@ Tage";
 "unit.hours" = "%@ Stunden";

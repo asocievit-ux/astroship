@@ -136,6 +136,7 @@
 "time.play" = "播放";
 "time.simulated" = "模拟";
 "time.slower" = "减速 / 倒退";
+"tour.start" = "巡游";
 "unit.au" = "%@ 天文单位";
 "unit.days" = "%@ 天";
 "unit.hours" = "%@ 小时";

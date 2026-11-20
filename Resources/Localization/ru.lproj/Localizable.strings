@@ -136,6 +136,7 @@
 "time.play" = "Пуск";
 "time.simulated" = "СИМУЛЯЦИЯ";
 "time.slower" = "Медленнее / назад";
+"tour.start" = "Экскурсия";
 "unit.au" = "%@ а. е.";
 "unit.days" = "%@ сут";
 "unit.hours" = "%@ ч";

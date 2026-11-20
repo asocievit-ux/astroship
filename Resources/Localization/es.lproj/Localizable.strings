@@ -136,6 +136,7 @@
 "time.play" = "Reproducir";
 "time.simulated" = "SIMULACIÓN";
 "time.slower" = "Más lento / atrás";
+"tour.start" = "Recorrido";
 "unit.au" = "%@ UA";
 "unit.days" = "%@ días";
 "unit.hours" = "%@ horas";

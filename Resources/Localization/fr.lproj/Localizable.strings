@@ -136,6 +136,7 @@
 "time.play" = "Lecture";
 "time.simulated" = "SIMULATION";
 "time.slower" = "Plus lent / arrière";
+"tour.start" = "Visite";
 "unit.au" = "%@ UA";
 "unit.days" = "%@ jours";
 "unit.hours" = "%@ heures";

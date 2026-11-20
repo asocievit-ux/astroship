@@ -18,7 +18,10 @@ struct AstroShipApp: App {
                 .environmentObject(sleepTimer)
                 .appLanguage(lang)
                 .task {
-                    sleepTimer.onSleep = { [weak m = model] in m?.setRendering(false) }
+                    sleepTimer.onSleep = { [weak m = model] in
+                        m?.endTour(restoreControls: false)   // keep the screen clean while it dims
+                        m?.setRendering(false)
+                    }
                     sleepTimer.onWake = { [weak m = model] in m?.setRendering(true) }
                     UIApplication.shared.isIdleTimerDisabled = true   // a viewing app: no auto-lock while open
                     AmbientMusic.shared.start()

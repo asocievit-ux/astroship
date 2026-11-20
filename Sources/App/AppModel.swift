@@ -65,6 +65,8 @@ final class AppModel: ObservableObject {
     @Published var showGalaxy = false
     @Published var showPicker = false
     @Published var showSettings = false
+    @Published private(set) var touring = false
+    lazy var tour = TourDirector(model: self)
     @Published var showMusic = false   // Settings > Music pushed (screenshot mode)
     @Published var showInfo = true
     /// Viewing mode: every bar and card hidden, only the scene. Any tap brings the controls back.
@@ -136,6 +138,28 @@ final class AppModel: ObservableObject {
     }
 
     func noteInteraction() { interacted = true }
+
+    // MARK: Tour
+
+    func startTour(at index: Int = 0) {
+        viewing = true           // hide every bar and card, like viewing mode
+        showInfo = false
+        touring = true
+        tour.start(at: index)
+    }
+
+    /// A tap (or the sleep timer) ends the tour. Finished tours return to the opening view.
+    func endTour(finished: Bool = false, restoreControls: Bool = true) {
+        guard touring else { return }
+        tour.stop()
+        touring = false
+        if finished {
+            applyOpeningView()
+        } else {
+            setRate(3_600)
+            viewing = !restoreControls
+        }
+    }
 
     func select(_ id: BodyID) {
         viewer.flyTo(id)
@@ -281,6 +305,14 @@ final class AppModel: ObservableObject {
             viewing = false
             SleepTimer.shared.minutes = 30
             showSettings = true
+            return
+        case "tour0", "tourjupiter", "toursaturn", "tourbelt":
+            let target: [String: TourStop] = ["tour0": .body(.sun), "tourjupiter": .body(.jupiter),
+                                              "toursaturn": .body(.saturn), "tourbelt": .belt]
+            let i = TourStop.all.firstIndex(of: target[name]!) ?? 0
+            viewer.focus = TourStop.all[i].focus; focus = viewer.focus
+            viewer.distanceKm = TourStop.all[i].distanceKm
+            startTour(at: i)
             return
         case "settingshelio":
             applyOpeningView()

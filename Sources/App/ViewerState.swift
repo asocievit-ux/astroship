@@ -77,6 +77,15 @@ final class ViewerState: @unchecked Sendable {
     }
     static let maxDistanceKm = 3.0e11
 
+    /// Tour: a slower fly with an explicit end distance.
+    func flyTo(_ id: BodyID, duration: Double, distanceKm d1: Double) {
+        locked {
+            _fly = FlyTransition(from: _focus, to: id, start: CACurrentMediaTime(), duration: duration,
+                                 d0: _distanceKm, d1: d1)
+            _focus = id
+        }
+    }
+
     func flyTo(_ id: BodyID) {
         locked {
             let now = CACurrentMediaTime()

@@ -136,6 +136,7 @@
 "time.play" = "Spela";
 "time.simulated" = "SIMULERING";
 "time.slower" = "Långsammare / bakåt";
+"tour.start" = "Rundtur";
 "unit.au" = "%@ AE";
 "unit.days" = "%@ dagar";
 "unit.hours" = "%@ timmar";

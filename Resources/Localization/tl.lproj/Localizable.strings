@@ -136,6 +136,7 @@
 "time.play" = "I-play";
 "time.simulated" = "SIMULASYON";
 "time.slower" = "Mas mabagal / pabalik";
+"tour.start" = "Paglilibot";
 "unit.au" = "%@ AU";
 "unit.days" = "%@ araw";
 "unit.hours" = "%@ oras";
