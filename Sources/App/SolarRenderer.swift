@@ -154,9 +154,8 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
             let c = SCNNode(geometry: Geo.sphere())
             let cm = SCNMaterial()
             cm.lightingModel = .lambert
-            cm.diffuse.contents = UIColor.white
-            cm.transparent.contents = clouds
-            cm.transparencyMode = .rgbZero
+            cm.diffuse.contents = clouds          // white clouds on black, added on top of the lit surface
+            cm.blendMode = .add
             cm.writesToDepthBuffer = false
             c.geometry?.firstMaterial = cm
             c.simdScale = SIMD3<Float>(repeating: r * 1.006)
@@ -318,6 +317,9 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
     /// - a short head segment joins the last grid point to the body's exact position every frame.
     private func updateTrails(jd: Double, sunRel: SIMD3<Float>, options: DisplayOptions, show: Bool) {
         let vKmPerDay = GalacticMotion.velocityEcliptic * 86_400
+        // Simulated days per display frame: at high speed the grid is coarsened (in powers of two, so
+        // it stays stable) to about four new points per frame, but never below 48 points per orbit.
+        let daysPerFrame = abs(state.clock.rate) / 86_400 / 60
         for id in Self.trailBodies {
             let body = Catalog.body(id)
             let node = lineNode(&trailNodes, id, order: 6)
@@ -327,8 +329,12 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
             head.isHidden = !on
             guard on else { continue }
             let dur = trailDuration(id)
-            let samples = body.kind == .comet ? 1200 : (id == .moon ? 360 : 720)
-            let h = dur / Double(samples)
+            let baseSamples = body.kind == .comet ? 1200 : (id == .moon ? 360 : 720)
+            let baseH = dur / Double(baseSamples)
+            let period = Catalog.periodDays(id) ?? dur
+            var h = baseH
+            while h < daysPerFrame / 4, h * 2 <= period / 48 { h *= 2 }
+            let samples = max(2, Int((dur / h).rounded()))
             let last = Int((jd / h).rounded(.down))
             let first = last - samples + 1
             var cache = trailCache[id] ?? TrailCache(h: h)
