@@ -170,6 +170,8 @@ targets:
         CFBundleDevelopmentRegion: en
         CFBundleLocalizations: [en, ja, zh-Hans, es, pt, fr, de, tl, ru, sv, he]
         ITSAppUsesNonExemptEncryption: false
+        # Shared localized InfoPlist.strings carry this key; the visionOS app itself never asks for tracking.
+        NSUserTrackingUsageDescription: "Your choice lets AstroShip show ads that are more relevant to you. The app works the same either way."
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: true
           UIApplicationPreferredDefaultSceneSessionRole: UIWindowSceneSessionRoleApplication
