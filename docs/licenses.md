@@ -13,8 +13,8 @@
 | Galaxy top view, sun glow, star sprite, app icon | Generated procedurally by `tools/build_assets.py` / icon script | Own work |
 
 ## Background music
-Played as an endless playlist in shuffled order (reshuffled every cycle, no back-to-back repeats). Re-encoded to AAC 144 kbps, 44.1 kHz stereo; files `Resources/Audio/bgm1-4.m4a`. Every audio file in `Resources/Audio` is picked up automatically — add one with `tools/add_bgm.sh` and list it here.
-All four are used under the **Pixabay Content License** — summary: https://pixabay.com/service/license-summary/
+Played as an endless playlist in shuffled order (reshuffled every cycle, no back-to-back repeats). Re-encoded to AAC 128 kbps, 44.1 kHz stereo; files `Resources/Audio/bgm1-6.m4a`. Every audio file in `Resources/Audio` is picked up automatically — add one with `tools/add_bgm.sh` and list it here.
+All six are used under the **Pixabay Content License** — summary: https://pixabay.com/service/license-summary/
 
 | # | File | Title | Creator (Pixabay) | Pixabay page | Length |
 |---|------|-------|-------------------|--------------|--------|
@@ -22,8 +22,10 @@ All four are used under the **Pixabay Content License** — summary: https://pix
 | 2 | bgm2.m4a | Activate Feminine Energy | soul_frequencies | https://pixabay.com/music/activate-feminine-energy-492002/ | 1:00 |
 | 3 | bgm3.m4a | 528hz Frequency Ambient Music (Meditation, Calming, Zen, Spiritual Music) | ribhavagrawal | https://pixabay.com/music/528hz-frequency-ambient-music-meditationcalmingzenspiritual-music-237574/ | 5:34 |
 | 4 | bgm4.m4a | Revelation of the Misty Planet (396Hz & 528 Hz Meditation) | Siarhei_Korbut | https://pixabay.com/ja/music/瞑想-精神的な-revelation-of-the-misty-planet-396hz-amp-528-hz-meditation-471813/ | 9:55 |
+| 5 | bgm5.m4a | Sunset Glow (Relaxation Dreamy) | Siarhei_Korbut | https://pixabay.com/ja/music/モダンクラシック-sunset-glow-relaxation-dreamy-583603/ | 10:00 |
+| 6 | bgm6.m4a | Sweet Dreams 528 Hz Short | Siarhei_Korbut | https://pixabay.com/ja/music/瞑想-精神的な-sweet-dreams-528-hz-short-377543/ | 3:45 |
 
 Notes:
-- Tracks 1 and 4 are registered with YouTube Content ID by their creator (a claim can appear on videos that contain it; this does not affect use inside the app).
+- Tracks 1, 4, 5 and 6 are registered with YouTube Content ID by their creator (a claim can appear on videos that contain it; this does not affect use inside the app).
 - Page URLs are built from the Pixabay track IDs in the original file names (Pixabay resolves `/music/<slug>-<id>/`); verify in a browser before publishing.
 - Pixabay tracks must not be redistributed as standalone audio files; here they are only embedded in the app.

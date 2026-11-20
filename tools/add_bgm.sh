@@ -5,5 +5,5 @@
 set -euo pipefail
 in="$1"; name="${2:-$(basename "${in%.*}")}"
 out="$(cd "$(dirname "$0")/.." && pwd)/Resources/Audio/${name}.m4a"
-ffmpeg -y -loglevel error -i "$in" -vn -c:a aac -b:a 144k -ac 2 -ar 44100 "$out"
+ffmpeg -y -loglevel error -i "$in" -vn -c:a aac -b:a 128k -ac 2 -ar 44100 "$out"
 echo "added $out"
