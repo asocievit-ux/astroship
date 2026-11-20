@@ -59,6 +59,8 @@ final class AppModel: ObservableObject {
     @Published var showPicker = false
     @Published var showSettings = false
     @Published var showInfo = true
+    /// Viewing mode: every bar and card hidden, only the scene. Any tap brings the controls back.
+    @Published var viewing = false
     /// Km travelled through the galaxy since the app was opened (real time).
     @Published var travelledKm = 0.0
     private let openedAt = Date()
@@ -243,6 +245,10 @@ final class AppModel: ObservableObject {
             mode = .heliocentric
             setRate(SpeedSteps.values.last!)
             debugStats = true
+        case "viewing":
+            applyOpeningView()
+            viewing = true
+            return
         case "picker":
             showPicker = true
         case "fly":

@@ -127,3 +127,4 @@
 "unit.lightMinutes" = "luz: %@ min";
 "unit.lightSeconds" = "luz: %@ s";
 "unit.years" = "%@ años";
+"view.mode" = "Modo contemplación";

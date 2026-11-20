@@ -127,3 +127,4 @@
 "unit.lightMinutes" = "ljus: %@ min";
 "unit.lightSeconds" = "ljus: %@ s";
 "unit.years" = "%@ år";
+"view.mode" = "Visningsläge";

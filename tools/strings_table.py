@@ -61,6 +61,7 @@ UI = {
  "picker.comets":  ["Comets", "彗星", "彗星", "Cometas", "Cometas", "Comètes", "Kometen", "Mga kometa", "Кометы", "Kometer", "שביטים"],
  "common.done":  ["Done", "完了", "完成", "Listo", "OK", "OK", "Fertig", "Tapos", "Готово", "Klar", "סיום"],
  "common.close": ["Close", "閉じる", "关闭", "Cerrar", "Fechar", "Fermer", "Schließen", "Isara", "Закрыть", "Stäng", "סגירה"],
+ "view.mode":    ["Viewing mode", "鑑賞モード", "观赏模式", "Modo contemplación", "Modo contemplação", "Mode contemplation", "Betrachtungsmodus", "Viewing mode", "Режим просмотра", "Visningsläge", "מצב צפייה"],
  "frame.sun":    ["Solar", "太陽中心", "太阳系", "Solar", "Solar", "Solaire", "Sonne", "Araw", "Солнце", "Sol", "שמש"],
  "frame.galaxy": ["Galaxy", "銀河を進む", "银河", "Galaxia", "Galáxia", "Galaxie", "Galaxis", "Galaxy", "Галактика", "Galax", "גלקסיה"],
  "time.live":      ["LIVE", "現在", "实时", "EN VIVO", "AO VIVO", "EN DIRECT", "LIVE", "LIVE", "СЕЙЧАС", "LIVE", "עכשיו"],

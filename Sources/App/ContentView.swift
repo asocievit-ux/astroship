@@ -10,16 +10,22 @@ struct ContentView: View {
         ZStack {
             SolarSceneView(model: model)
                 .ignoresSafeArea()
-            VStack(spacing: 10) {
-                TopBar()
-                if store.premiumNoticeVisible { PremiumBanner() }
-                Spacer()
-                if model.showInfo, let info = model.info { InfoCard(info: info) }
-                TimeBar()
+            if !model.viewing {
+                VStack(spacing: 10) {
+                    TopBar()
+                    if store.premiumNoticeVisible { PremiumBanner() }
+                    Spacer()
+                    if model.showInfo, let info = model.info { InfoCard(info: info) }
+                    TimeBar()
+                }
+                .padding(.horizontal, 12)
+                .padding(.bottom, 8)
+                .transition(.opacity)
             }
-            .padding(.horizontal, 12)
-            .padding(.bottom, 8)
         }
+        .animation(.easeInOut(duration: 0.25), value: model.viewing)
+        .statusBarHidden(model.viewing)
+        .persistentSystemOverlays(model.viewing ? .hidden : .automatic)
         .background(Color.black)
         .preferredColorScheme(.dark)
         .sheet(isPresented: $model.showPicker) { BodyPicker().environmentObject(model) }
@@ -45,10 +51,11 @@ struct TopBar: View {
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Circle().fill(model.isLive ? Color.red : Color.gray).frame(width: 7, height: 7)
-                    Text(model.isLive ? L("time.live") : L("time.simulated"))
-                        .font(.caption2.weight(.bold)).foregroundStyle(model.isLive ? Color.red : Color.secondary)
+                if model.isLive {
+                    HStack(spacing: 6) {
+                        Circle().fill(Color.red).frame(width: 7, height: 7)
+                        Text(L("time.live")).font(.caption2.weight(.bold)).foregroundStyle(Color.red)
+                    }
                 }
                 Text(model.dateText).font(.footnote.monospacedDigit()).foregroundStyle(.white)
                     .lineLimit(1).minimumScaleFactor(0.7)
@@ -56,21 +63,56 @@ struct TopBar: View {
             .padding(.horizontal, 12).padding(.vertical, 8)
             .glass()
             Spacer(minLength: 4)
-            Picker("", selection: $model.mode) {
-                Text(L("frame.sun")).tag(FrameMode.heliocentric)
-                Text(L("frame.galaxy")).tag(FrameMode.galactic)
-            }
-            .pickerStyle(.segmented)
-            .fixedSize()
-            .layoutPriority(2)
-            .padding(6)
-            .glass()
+            ModeToggle()
             VStack(spacing: 8) {
                 IconButton(system: "gearshape.fill", label: L("settings.title")) { model.showSettings = true }
                 IconButton(system: "hurricane", label: L("galaxy.title")) { model.showGalaxy = true }
+                Button { model.viewing = true } label: {
+                    SaturnGlyph().frame(width: 42, height: 42)
+                }
+                .glass()
+                .accessibilityLabel(L("view.mode"))
             }
         }
         .padding(.top, 4)
+    }
+}
+
+/// Heliocentric / galactic switch as two icons (sun / helix), labelled for VoiceOver.
+struct ModeToggle: View {
+    @EnvironmentObject var model: AppModel
+    var body: some View {
+        HStack(spacing: 2) {
+            seg(.heliocentric, "sun.max.fill", L("frame.sun"))
+            seg(.galactic, "tornado", L("frame.galaxy"))
+        }
+        .padding(3)
+        .glass()
+    }
+    private func seg(_ m: FrameMode, _ icon: String, _ label: String) -> some View {
+        let on = model.mode == m
+        return Button { model.mode = m } label: {
+            Image(systemName: icon).font(.system(size: 16, weight: .semibold))
+                .frame(width: 44, height: 36)
+                .foregroundStyle(on ? Color.black : Color.white)
+                .background(on ? Color.white.opacity(0.9) : Color.clear, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+        .accessibilityLabel(label)
+        .accessibilityAddTraits(on ? .isSelected : [])
+    }
+}
+
+/// Small Saturn drawing (SF Symbols has none): planet disc with a tilted ring.
+struct SaturnGlyph: View {
+    var body: some View {
+        ZStack {
+            Ellipse().stroke(Color.white.opacity(0.9), lineWidth: 1.8)
+                .frame(width: 28, height: 9).rotationEffect(.degrees(-22))
+            Circle().fill(Color(red: 0.93, green: 0.82, blue: 0.6)).frame(width: 13, height: 13)
+            // front half of the ring over the disc
+            Ellipse().trim(from: 0, to: 0.5).stroke(Color.white.opacity(0.9), lineWidth: 1.8)
+                .frame(width: 28, height: 9).rotationEffect(.degrees(-22))
+        }
     }
 }
 
@@ -95,16 +137,14 @@ struct TimeBar: View {
     var body: some View {
         HStack(spacing: 6) {
             Button { model.showPicker = true } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "scope")
-                    Text(model.focus.localizedName).lineLimit(1).minimumScaleFactor(0.75)
-                }
-                .fixedSize(horizontal: true, vertical: false)
-                .font(.subheadline.weight(.semibold))
-                .padding(.horizontal, 12).frame(height: 44)
-                .contentShape(Rectangle())
+                Image(systemName: "list.bullet.circle.fill")
+                    .font(.system(size: 20, weight: .semibold))
+                    .frame(width: 48, height: 44)
+                    .contentShape(Rectangle())
             }
             .accessibilityIdentifier("bodyPickerButton")
+            .accessibilityLabel(L("picker.title"))
+            .accessibilityValue(model.focus.localizedName)
             .layoutPriority(2)
             .foregroundStyle(.white)
             .glass()
@@ -120,11 +160,11 @@ struct TimeBar: View {
                     .padding(.trailing, model.isLive ? 10 : 0)
                 if !model.isLive {
                     Button { model.goLive() } label: {
-                        Text(L("time.now")).font(.caption.weight(.bold))
-                            .lineLimit(1).fixedSize()
-                            .padding(.horizontal, 10).frame(height: 30)
+                        Image(systemName: "clock.arrow.circlepath").font(.system(size: 15, weight: .bold))
+                            .frame(width: 40, height: 30)
                             .background(Color.accentColor, in: Capsule())
                     }
+                    .accessibilityLabel(L("time.now"))
                     .foregroundStyle(.white)
                     .padding(.trailing, 6)
                     .layoutPriority(1)

@@ -75,6 +75,7 @@ struct SolarSceneView: UIViewRepresentable {
 
         @objc func tap(_ g: UITapGestureRecognizer) {
             model.noteInteraction()
+            if model.viewing { model.viewing = false; return }   // viewing mode: a tap only restores the controls
             guard let v = g.view as? SCNView else { return }
             let p = g.location(in: v)
             if model.handleTap(at: p) { return }
@@ -86,6 +87,7 @@ struct SolarSceneView: UIViewRepresentable {
 
         @objc func doubleTap(_ g: UITapGestureRecognizer) {
             model.noteInteraction()
+            if model.viewing { model.viewing = false; return }
             model.select(model.viewer.focus)
         }
     }

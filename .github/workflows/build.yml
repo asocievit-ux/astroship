@@ -65,7 +65,7 @@ jobs:
             xcrun simctl bootstatus "$UDID" -b
             xcrun simctl install "$UDID" "$APP"
             xcrun simctl status_bar "$UDID" override --time "9:41" --batteryState charged --batteryLevel 100 || true
-            for SHOT in opening fast fasthelio tap fly picker earth saturn inner galactic galaxy; do
+            for SHOT in opening viewing fast fasthelio tap fly picker earth saturn inner galactic galaxy; do
               xcrun simctl terminate "$UDID" com.aihasakuramoto22.solarmotion 2>/dev/null || true
               xcrun simctl launch "$UDID" com.aihasakuramoto22.solarmotion -shot "$SHOT" -AppleLanguages "(ja)" -AppleLocale ja_JP
               sleep 14

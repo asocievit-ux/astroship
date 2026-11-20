@@ -127,3 +127,4 @@
 "unit.lightMinutes" = "光で %@ 分";
 "unit.lightSeconds" = "光で %@ 秒";
 "unit.years" = "%@ 年";
+"view.mode" = "鑑賞モード";
