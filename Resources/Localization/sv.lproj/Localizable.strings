@@ -109,7 +109,8 @@
 "settings.labels" = "Namn och markörer";
 "settings.language" = "Språk";
 "settings.moons" = "Månar";
-"settings.music" = "Musik (528 Hz)";
+"settings.music" = "Musik";
+"settings.orbit" = "Banor";
 "settings.orbits" = "Banor (solcentrerad)";
 "settings.scaleNote" = "Storlekar och avstånd är skalenliga, så planeterna är små jämfört med rymden mellan dem. Tryck nära en himlakropp eller välj den i listan för att flyga dit.";
 "settings.title" = "Inställningar";

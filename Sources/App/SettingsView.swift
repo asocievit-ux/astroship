@@ -53,10 +53,7 @@ struct SettingsView: View {
                           }
                         }
                     }
-                    Toggle(L("settings.orbits"), isOn: $model.options.orbits)
-                    Toggle(L("settings.trails"), isOn: $model.options.trails)
-                    Toggle(L("settings.moons"), isOn: $model.options.moons)
-                    Toggle(L("settings.dwarfs"), isOn: $model.options.dwarfs)
+                    Toggle(L("settings.orbit"), isOn: $model.orbitsShown)
                     Toggle(L("settings.comets"), isOn: $model.options.comets)
                     Toggle(L("settings.belt"), isOn: $model.options.belt)
                 }

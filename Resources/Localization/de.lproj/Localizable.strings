@@ -109,7 +109,8 @@
 "settings.labels" = "Namen und Markierungen";
 "settings.language" = "Sprache";
 "settings.moons" = "Monde";
-"settings.music" = "Musik (528 Hz)";
+"settings.music" = "Musik";
+"settings.orbit" = "Bahnen";
 "settings.orbits" = "Bahnen (sonnenzentriert)";
 "settings.scaleNote" = "Größen und Entfernungen sind maßstabsgetreu, daher sind Planeten winzig im Vergleich zum Raum dazwischen. Tippe in die Nähe eines Himmelskörpers oder wähle ihn in der Liste, um hinzufliegen.";
 "settings.title" = "Einstellungen";

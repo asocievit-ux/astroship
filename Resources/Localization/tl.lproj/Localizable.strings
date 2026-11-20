@@ -109,7 +109,8 @@
 "settings.labels" = "Mga pangalan at marka";
 "settings.language" = "Wika";
 "settings.moons" = "Mga buwan";
-"settings.music" = "Musika (528 Hz)";
+"settings.music" = "Musika";
+"settings.orbit" = "Mga orbit";
 "settings.orbits" = "Mga orbit (sa Araw)";
 "settings.scaleNote" = "Totoo sa sukat ang laki at layo, kaya napakaliit ng mga planeta kumpara sa espasyo sa pagitan nila. I-tap malapit sa isang bagay sa kalawakan o piliin ito sa listahan para lumipad doon.";
 "settings.title" = "Settings";

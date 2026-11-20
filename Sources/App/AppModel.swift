@@ -50,7 +50,14 @@ final class AppModel: ObservableObject {
     @Published var focus: BodyID = .earth
     @Published var info: BodyInfo?
     @Published var mode: FrameMode = .heliocentric {
-        didSet { viewer.mode = mode; UserDefaults.standard.set(mode.rawValue, forKey: "frameMode") }
+        didSet {
+            viewer.mode = mode; UserDefaults.standard.set(mode.rawValue, forKey: "frameMode")
+            // One "Orbits" switch in Settings: each mode starts from its own default when entered
+            // (galactic helix trails on, heliocentric orbit ellipses off); the user can flip it within a mode.
+            if mode != oldValue {
+                if mode == .galactic { options.trails = true } else { options.orbits = false }
+            }
+        }
     }
     @Published var options = DisplayOptions() {
         didSet { viewer.options = options; saveOptions() }
@@ -100,18 +107,16 @@ final class AppModel: ObservableObject {
     }
 
     static let openingRate = 2_629_800.0          // 1 month per second
-    static let openingDistanceKm = 2.0e10         // about 130 AU: trails stream across the screen
+    static let openingDistanceKm = 2.45e9         // about 16 AU: the asteroid belt spans the screen width
 
-    /// The camera looks at the Sun towards galactic longitude -3 deg, latitude +18 deg (matches the user's reference framing), so the bright
-    /// Milky Way core with its dust lanes sits in the lower left behind the Sun and the Sun's path and
-    /// the planets' trails run diagonally across the screen. The Sun is the focus (floating origin), so
-    /// the camera keeps homing on it as it moves.
+    /// The user's reference framing (v3): camera ~16 deg above the ecliptic, in the vertical plane that
+    /// holds the Sun's galactic velocity and behind it, so with the ecliptic-north "up" the motion points
+    /// straight up the screen and the helix trails stream down from the Sun; the asteroid belt is a wide,
+    /// nearly edge-on ellipse. The Sun is the focus (floating origin), so the camera keeps homing on it.
     static func openingAngles() -> (Double, Double) {
-        let l = -3.0 * .pi / 180, b = 18.0 * .pi / 180
-        let g = SIMD3<Double>(cos(b) * cos(l), cos(b) * sin(l), sin(b))
-        let view = normalize(Frames.eclToScene * (Frames.galToEcl * g))   // camera -> Sun
-        let d = -view                                                    // Sun -> camera
-        return (atan2(d.x, d.z), asin(max(-1, min(1, d.y))))
+        let v = Frames.eclToScene * GalacticMotion.velocityEcliptic
+        let yaw = atan2(v.x, v.z) - .pi
+        return (yaw, 16.0 * .pi / 180)
     }
 
     /// Sleep timer: stop / restart SceneKit rendering (the simulated clock keeps its own time).
@@ -190,6 +195,13 @@ final class AppModel: ObservableObject {
         if focus != id { focus = id }
     }
 
+    /// Settings' single "Orbits" switch: helix trails in the galactic mode, orbit ellipses in the
+    /// heliocentric one.
+    var orbitsShown: Bool {
+        get { mode == .galactic ? options.trails : options.orbits }
+        set { if mode == .galactic { options.trails = newValue } else { options.orbits = newValue } }
+    }
+
     // MARK: Options persistence
 
     private func saveOptions() {
@@ -204,8 +216,8 @@ final class AppModel: ObservableObject {
         let d = UserDefaults.standard
         guard d.object(forKey: "opt.labels") != nil else { return }
         options = DisplayOptions(labels: d.bool(forKey: "opt.labels"), orbits: d.bool(forKey: "opt.orbits"),
-                                 trails: d.bool(forKey: "opt.trails"), moons: d.bool(forKey: "opt.moons"),
-                                 dwarfs: d.bool(forKey: "opt.dwarfs"), comets: d.bool(forKey: "opt.comets"),
+                                 trails: d.bool(forKey: "opt.trails"), moons: true,   // moons and dwarf
+                                 dwarfs: true, comets: d.bool(forKey: "opt.comets"),
                                  belt: d.bool(forKey: "opt.belt"))
     }
 
@@ -268,6 +280,12 @@ final class AppModel: ObservableObject {
             applyOpeningView()
             viewing = false
             SleepTimer.shared.minutes = 30
+            showSettings = true
+            return
+        case "settingshelio":
+            applyOpeningView()
+            viewing = false
+            mode = .heliocentric
             showSettings = true
             return
         case "music":

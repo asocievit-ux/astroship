@@ -54,7 +54,7 @@ struct TopBar: View {
     @EnvironmentObject var model: AppModel
 
     var body: some View {
-        HStack(alignment: .top, spacing: 8) {
+        HStack(alignment: .center, spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
                 if model.isLive {
                     HStack(spacing: 6) {
@@ -68,16 +68,20 @@ struct TopBar: View {
             .padding(.horizontal, 12).padding(.vertical, 8)
             .glass()
             Spacer(minLength: 4)
-            ModeToggle()
-            VStack(spacing: 8) {
-                IconButton(system: "gearshape.fill", label: L("settings.title")) { model.showSettings = true }
-                IconButton(system: "hurricane", label: L("galaxy.title")) { model.showGalaxy = true }
+            // All top controls in one row (mode switch | settings, galaxy, viewing mode), one glass capsule.
+            HStack(spacing: 2) {
+                ModeToggle(embedded: true)
+                Rectangle().fill(Color.white.opacity(0.25)).frame(width: 1, height: 22).padding(.horizontal, 3)
+                IconButton(system: "gearshape", label: L("settings.title"), embedded: true) { model.showSettings = true }
+                IconButton(system: "hurricane", label: L("galaxy.title"), embedded: true) { model.showGalaxy = true }
                 Button { model.viewing = true } label: {
-                    SaturnGlyph().frame(width: 42, height: 42)
+                    SaturnGlyph().frame(width: 38, height: 36)
                 }
-                .glass()
                 .accessibilityLabel(L("view.mode"))
             }
+            .padding(3)
+            .glass()
+            .layoutPriority(1)
         }
         .padding(.top, 4)
     }
@@ -86,19 +90,19 @@ struct TopBar: View {
 /// Heliocentric / galactic switch as two icons (sun / helix), labelled for VoiceOver.
 struct ModeToggle: View {
     @EnvironmentObject var model: AppModel
+    var embedded = false
     var body: some View {
-        HStack(spacing: 2) {
-            seg(.heliocentric, "sun.max.fill", L("frame.sun"))
+        let row = HStack(spacing: 2) {
+            seg(.heliocentric, "sun.max", L("frame.sun"))
             seg(.galactic, "tornado", L("frame.galaxy"))
         }
-        .padding(3)
-        .glass()
+        if embedded { row } else { row.padding(3).glass() }
     }
     private func seg(_ m: FrameMode, _ icon: String, _ label: String) -> some View {
         let on = model.mode == m
         return Button { model.mode = m } label: {
-            Image(systemName: icon).font(.system(size: 16, weight: .semibold))
-                .frame(width: 44, height: 36)
+            Image(systemName: icon).font(.system(size: 16, weight: .regular))
+                .frame(width: 40, height: 36)
                 .foregroundStyle(on ? Color.black : Color.white)
                 .background(on ? Color.white.opacity(0.9) : Color.clear, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
@@ -124,15 +128,16 @@ struct SaturnGlyph: View {
 struct IconButton: View {
     let system: String
     let label: String
+    var embedded = false
     let action: () -> Void
     var body: some View {
-        Button(action: action) {
-            Image(systemName: system).font(.system(size: 17, weight: .semibold))
-                .frame(width: 42, height: 42)
+        let b = Button(action: action) {
+            Image(systemName: system).font(.system(size: 17, weight: embedded ? .regular : .semibold))
+                .frame(width: embedded ? 38 : 42, height: embedded ? 36 : 42)
                 .foregroundStyle(.white)
         }
-        .glass()
         .accessibilityLabel(label)
+        if embedded { b } else { b.glass() }
     }
 }
 

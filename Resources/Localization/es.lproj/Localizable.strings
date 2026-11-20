@@ -109,7 +109,8 @@
 "settings.labels" = "Nombres y marcas";
 "settings.language" = "Idioma";
 "settings.moons" = "Satélites";
-"settings.music" = "Música (528 Hz)";
+"settings.music" = "Música";
+"settings.orbit" = "Órbitas";
 "settings.orbits" = "Órbitas (centrado en el Sol)";
 "settings.scaleNote" = "Tamaños y distancias están a escala real, así que los planetas son diminutos frente al espacio entre ellos. Toca cerca de un astro o elígelo en la lista para volar allí.";
 "settings.title" = "Ajustes";

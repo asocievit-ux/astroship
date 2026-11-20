@@ -109,7 +109,8 @@
 "settings.labels" = "名前と目印";
 "settings.language" = "言語";
 "settings.moons" = "衛星";
-"settings.music" = "音楽（528Hz）";
+"settings.music" = "音楽";
+"settings.orbit" = "軌道";
 "settings.orbits" = "軌道（太陽中心）";
 "settings.scaleNote" = "大きさも距離も本物の比率なので、惑星は間の空間に比べてとても小さく見えます。天体の近くをタップするか、一覧から選ぶと近くまで飛べます。";
 "settings.title" = "設定";

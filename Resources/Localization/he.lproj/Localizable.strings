@@ -109,7 +109,8 @@
 "settings.labels" = "שמות וסימונים";
 "settings.language" = "שפה";
 "settings.moons" = "ירחים";
-"settings.music" = "מוזיקה (528 הרץ)";
+"settings.music" = "מוזיקה";
+"settings.orbit" = "מסלולים";
 "settings.orbits" = "מסלולים (סביב השמש)";
 "settings.scaleNote" = "הגדלים והמרחקים בקנה מידה אמיתי, ולכן כוכבי הלכת זעירים לעומת המרחק ביניהם. הקישו ליד גרם שמיים או בחרו אותו ברשימה כדי לטוס אליו.";
 "settings.title" = "הגדרות";
