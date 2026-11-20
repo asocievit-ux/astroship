@@ -130,12 +130,11 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         SWIFT_STRICT_CONCURRENCY: minimal
       configs:
-        # PLACEHOLDER: no production AdMob app exists for AstroShip yet, so Debug AND Release
-        # (TestFlight) embed Google's official test app ID. See Sources/App/AdConfig.swift.
+        # Debug: Google's test app ID. Release: AstroShip's AdMob app. See Sources/App/AdConfig.swift.
         Debug:
           GAD_APPLICATION_ID: "ca-app-pub-3940256099942544~1458002511"
         Release:
-          GAD_APPLICATION_ID: "ca-app-pub-3940256099942544~1458002511"
+          GAD_APPLICATION_ID: "ca-app-pub-7991339056188042~2002874937"
 
   # Native Apple Vision Pro app. Same bundle ID as the iOS app (universal purchase), no ads SDK.
   AstroShipVision:

@@ -3,20 +3,15 @@ import Foundation
 
 /// AdMob configuration for AstroShip.
 ///
-/// ┌──────────────────────────────────────────────────────────────────────────────┐
-/// │ PLACEHOLDER: no production AdMob app / ad unit exists for AstroShip yet.     │
-/// │ Until both IDs below are filled in, every build (Debug, TestFlight and an    │
-/// │ App Store build) requests Google's official TEST app open ad only.           │
-/// │ To go live: create the app + App Open unit in AdMob, put the IDs here AND    │
-/// │ set GAD_APPLICATION_ID for the Release config in project.yml.                │
-/// └──────────────────────────────────────────────────────────────────────────────┘
+/// Debug builds embed Google's test app ID and always request the test App Open unit.
+/// Release builds embed the production app ID; only an App Store copy requests the production unit.
 enum AdConfig {
     static let testApplicationID = "ca-app-pub-3940256099942544~1458002511"
     static let testAppOpenUnitID = "ca-app-pub-3940256099942544/5575463023"
-    /// TODO(production): "ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY"
-    static let productionApplicationID: String? = nil
-    /// TODO(production): "ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ"
-    static let productionAppOpenUnitID: String? = nil
+    /// AstroShip in AdMob (publisher pub-7991339056188042). Release builds embed this app ID.
+    static let productionApplicationID: String? = "ca-app-pub-7991339056188042~2002874937"
+    /// App Open unit. Served only to App Store copies; Debug, simulator and TestFlight use the test unit.
+    static let productionAppOpenUnitID: String? = "ca-app-pub-7991339056188042/2445728065"
 
     static var plistApplicationID: String? {
         Bundle.main.object(forInfoDictionaryKey: "GADApplicationIdentifier") as? String
