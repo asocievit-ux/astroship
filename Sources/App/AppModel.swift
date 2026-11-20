@@ -95,19 +95,17 @@ final class AppModel: ObservableObject {
     }
 
     static let openingRate = 2_629_800.0          // 1 month per second
-    static let openingDistanceKm = 6.0e9          // about 40 AU: zoomed out so the planets' spirals show
+    static let openingDistanceKm = 1.2e10         // about 80 AU: trails stream across the screen
 
-    /// Camera direction about 60 degrees off the Sun's direction of travel, tilted up a little:
-    /// the Sun's straight path crosses the screen and the planets' trails spiral around it.
+    /// The camera looks at the Sun towards galactic longitude 14 deg, latitude +24 deg, so the bright
+    /// Milky Way core with its dust lanes sits in the lower left behind the Sun and the Sun's path and
+    /// the planets' trails run diagonally across the screen. The Sun is the focus (floating origin), so
+    /// the camera keeps homing on it as it moves.
     static func openingAngles() -> (Double, Double) {
-        let v = normalize(Frames.eclToScene * GalacticMotion.velocityEcliptic)
-        let up = SIMD3<Double>(0, 1, 0)
-        var side = cross(v, up)
-        if length(side) < 1e-6 { side = SIMD3<Double>(1, 0, 0) }
-        side = normalize(side)
-        let a = 60.0 * .pi / 180
-        var d = v * cos(a) + side * sin(a)
-        d = normalize(d + up * 0.25)
+        let l = 14.0 * .pi / 180, b = 24.0 * .pi / 180
+        let g = SIMD3<Double>(cos(b) * cos(l), cos(b) * sin(l), sin(b))
+        let view = normalize(Frames.eclToScene * (Frames.galToEcl * g))   // camera -> Sun
+        let d = -view                                                    // Sun -> camera
         return (atan2(d.x, d.z), asin(max(-1, min(1, d.y))))
     }
 
