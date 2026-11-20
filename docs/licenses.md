@@ -13,16 +13,17 @@
 | Galaxy top view, sun glow, star sprite, app icon | Generated procedurally by `tools/build_assets.py` / icon script | Own work |
 
 ## Background music
-Played in this order as a looping playlist (re-encoded to AAC 144 kbps stereo; files `Resources/Audio/bgm1-3.m4a`).
-All three are used under the **Pixabay Content License** — summary: https://pixabay.com/service/license-summary/
+Played in this order as a looping playlist (re-encoded to AAC 144 kbps stereo; files `Resources/Audio/bgm1-4.m4a`).
+All four are used under the **Pixabay Content License** — summary: https://pixabay.com/service/license-summary/
 
 | # | File | Title | Creator (Pixabay) | Pixabay page | Length |
 |---|------|-------|-------------------|--------------|--------|
 | 1 | bgm1.m4a | Meditation Binaural 8 Hz 528 Hz | siarhei_korbut | https://pixabay.com/music/meditation-binaural-8-hz-528-hz-396680/ | 9:55 |
 | 2 | bgm2.m4a | Activate Feminine Energy | soul_frequencies | https://pixabay.com/music/activate-feminine-energy-492002/ | 1:00 |
 | 3 | bgm3.m4a | 528hz Frequency Ambient Music (Meditation, Calming, Zen, Spiritual Music) | ribhavagrawal | https://pixabay.com/music/528hz-frequency-ambient-music-meditationcalmingzenspiritual-music-237574/ | 5:34 |
+| 4 | bgm4.m4a | Revelation of the Misty Planet (396Hz & 528 Hz Meditation) | Siarhei_Korbut | https://pixabay.com/ja/music/瞑想-精神的な-revelation-of-the-misty-planet-396hz-amp-528-hz-meditation-471813/ | 9:55 |
 
 Notes:
-- Track 1 is registered with YouTube Content ID by its creator (a claim can appear on videos that contain it; this does not affect use inside the app).
+- Tracks 1 and 4 are registered with YouTube Content ID by their creator (a claim can appear on videos that contain it; this does not affect use inside the app).
 - Page URLs are built from the Pixabay track IDs in the original file names (Pixabay resolves `/music/<slug>-<id>/`); verify in a browser before publishing.
 - Pixabay tracks must not be redistributed as standalone audio files; here they are only embedded in the app.

@@ -1,7 +1,7 @@
 import AVFoundation
 import Foundation
 
-/// Background music: three Pixabay Content License tracks (Resources/Audio/bgm1-3.m4a, see
+/// Background music: four Pixabay Content License tracks (Resources/Audio/bgm1-4.m4a, see
 /// docs/licenses.md) played in order as an endless gapless playlist. Plays from launch at a modest volume. Session category .ambient: mixes with other audio and
 /// respects the silent switch; the hardware volume buttons set the level. Pauses in the background.
 @MainActor
@@ -10,7 +10,7 @@ final class AmbientMusic {
 
     private let engine = AVAudioEngine()
     private let player = AVAudioPlayerNode()
-    // Streamed from disk (16 minutes in total; far too big to hold decoded). The next track is always
+    // Streamed from disk (36 minutes in total; far too big to hold decoded). The next track is always
     // queued behind the playing one, so the playlist is gapless.
     private var files: [AVAudioFile] = []
     private var nextFile = 0
@@ -89,7 +89,7 @@ final class AmbientMusic {
     }
 
     private var scheduled = false
-    private static let playlist = ["bgm1", "bgm2", "bgm3"]
+    private static let playlist = ["bgm1", "bgm2", "bgm3", "bgm4"]
     private var generation = 0
 
     private func scheduleNext() {
