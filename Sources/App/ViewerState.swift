@@ -11,7 +11,7 @@ struct DisplayOptions: Equatable {
     var trails = true
     var moons = true
     var dwarfs = true
-    var comets = true
+    var comets = false      // hidden at first launch; Settings can show them (the tour always does)
     var belt = true
 }
 

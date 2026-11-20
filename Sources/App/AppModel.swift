@@ -153,6 +153,7 @@ final class AppModel: ObservableObject {
         options.orbits = false
         options.trails = false
         options.belt = true
+        options.comets = true    // the tour visits the comets
     }
 
     /// A tap (or the sleep timer) ends the tour. Finished tours return to the opening view.
