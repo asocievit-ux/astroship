@@ -49,22 +49,19 @@ final class GalaxyRenderer: NSObject, SCNSceneRendererDelegate {
         discNode.eulerAngles.x = -.pi / 2      // plane lies in XZ; image top = -Z
         scene.rootNode.addChildNode(discNode)
 
-        // Bulge glow (seen edge-on too)
-        for (s, a) in [(SIMD3<Float>(6.5, 2.2, 6.5), 0.55), (SIMD3<Float>(3.2, 1.3, 3.2), 0.8)] {
-            let g = SCNSphere(radius: 0.5)
-            g.segmentCount = 48
-            let gm = SCNMaterial()
-            gm.lightingModel = .constant
-            gm.diffuse.contents = UIColor(red: 1, green: 0.85, blue: 0.6, alpha: 1)
-            gm.transparency = CGFloat(a) * 0.35
-            gm.blendMode = .add
-            gm.writesToDepthBuffer = false
-            gm.fresnelExponent = 1.5
-            g.firstMaterial = gm
-            let n = SCNNode(geometry: g)
-            n.simdScale = s
-            scene.rootNode.addChildNode(n)
-        }
+        // Bulge glow: a soft billboard sprite (solid spheres read as a flat disc).
+        let glow = SCNPlane(width: 7.5, height: 7.5)
+        let gm = SCNMaterial()
+        gm.lightingModel = .constant
+        gm.diffuse.contents = Geo.texture("galaxy_glow.png")
+        gm.blendMode = .add
+        gm.writesToDepthBuffer = false
+        gm.readsFromDepthBuffer = false
+        glow.firstMaterial = gm
+        let glowNode = SCNNode(geometry: glow)
+        glowNode.position = SCNVector3(0, 0.05, 0)
+        glowNode.constraints = [SCNBillboardConstraint()]
+        scene.rootNode.addChildNode(glowNode)
 
         // Sun's galactic orbit (circle of radius R0)
         let r0 = Float(GalacticMotion.r0Kpc)

@@ -64,7 +64,8 @@ for t0 in minors:
 spur, _ = arm(arm_phase(sun_th, 8.2), 0.4, 6.5, 10.0)
 spur *= np.exp(-(np.angle(np.exp(1j * (th - sun_th))) / 0.5) ** 2)
 A += 0.55 * spur
-armlight = A * np.clip(0.5 + 0.3 * feather + 0.07 * fine + 0.4 * cl, 0, None) * 1.25
+armlight = A * np.clip(0.55 + 0.22 * feather + 0.03 * fine + 0.35 * cl, 0, None) * 1.25
+armlight = np.asarray(Image.fromarray((np.clip(armlight / 3, 0, 1) * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.6)), np.float32) / 255 * 3
 
 img = np.zeros((S, S, 3), np.float32)
 # diffuse old disc: warm inside, neutral outside, with spiral-aligned faint structure
@@ -87,7 +88,8 @@ img += armlight[..., None] * np.array([0.52, 0.66, 1.0]) * 0.95
 
 # dust lanes (absorption) on the inner edge of the arms + patchy dust in the inner disc
 dust = np.clip(lane * (0.7 + 0.3 * cl + 0.15 * feather), 0, 1.2)
-dust += np.clip(0.25 * np.exp(-r / 4.5) * (feather > 0.6), 0, 1) * (r > 1.6)
+dust += np.clip(0.25 * np.exp(-r / 4.5) * np.clip(feather - 0.3, 0, 1), 0, 1) * np.clip(r - 1.6, 0, 1)
+dust = np.asarray(Image.fromarray((np.clip(dust / 1.5, 0, 1) * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(2.0)), np.float32) / 255 * 1.5
 img *= np.exp(-2.4 * dust)[..., None] * np.array([1.0, 0.95, 0.9]) + (1 - np.exp(-2.4 * dust))[..., None] * np.array([0.10, 0.05, 0.02]) * 0.0 + 0
 
 # star clusters and HII regions along the arms
@@ -123,3 +125,11 @@ out = Image.fromarray((img * 255).astype(np.uint8)).filter(ImageFilter.GaussianB
 out.save("Resources/Textures/galaxy_top.jpg", quality=90)
 out.resize((1024, 1024), Image.LANCZOS).save("/workspace/solar_tools/galaxy_preview.png")
 print("ok")
+
+# Soft warm glow sprite for the bulge (billboard in the 3-D galaxy screen; black = transparent).
+n = 256
+gy, gx = np.mgrid[0:n, 0:n].astype(np.float32)
+gr = np.hypot(gx - n / 2 + 0.5, gy - n / 2 + 0.5) / (n / 2)
+ga = (np.exp(-(gr / 0.22) ** 2) * 0.55 + np.exp(-(gr / 0.5) ** 2) * 0.22) * np.clip((1 - gr) / 0.15, 0, 1)
+gimg = np.clip(ga[..., None] * np.array([1.0, 0.86, 0.62]), 0, 1)
+Image.fromarray((gimg * 255).astype(np.uint8)).save("Resources/Textures/galaxy_glow.png")

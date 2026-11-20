@@ -196,20 +196,19 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
         let root = SCNNode()
         func sprite(_ tex: String, width: CGFloat, height: CGFloat) -> SCNNode {
             let n = SCNNode()
-            for k in 0..<3 {
-                let plane = SCNPlane(width: width, height: height)
-                let m = SCNMaterial()
-                m.lightingModel = .constant
-                m.diffuse.contents = Geo.texture(tex)
-                m.blendMode = .add
-                m.writesToDepthBuffer = false
-                m.isDoubleSided = true
-                plane.firstMaterial = m
-                let p = SCNNode(geometry: plane)
-                p.position = SCNVector3(0, Float(height) / 2, 0)
-                p.eulerAngles.y = Float(k) * .pi / 3
-                n.addChildNode(p)
-            }
+            // One plane per tail; each frame it is spun about the tail axis to face the camera
+            // (crossed planes showed hard lines when seen edge-on).
+            let plane = SCNPlane(width: width, height: height)
+            let m = SCNMaterial()
+            m.lightingModel = .constant
+            m.diffuse.contents = Geo.texture(tex)
+            m.blendMode = .add
+            m.writesToDepthBuffer = false
+            m.isDoubleSided = true
+            plane.firstMaterial = m
+            let p = SCNNode(geometry: plane)
+            p.position = SCNVector3(0, Float(height) / 2, 0)
+            n.addChildNode(p)
             return n
         }
         let ion = sprite("comet_ion.png", width: 0.09, height: 1.0)
@@ -523,7 +522,14 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
             if tail.isHidden { continue }
             let len = min(1.5e8, 2.0e7 / pow(max(rAU, 0.3), 2)) / Self.unitKm
             let away = normalize(Frames.eclToScene * p)
-            tail.simdOrientation = simd_quatf(from: SIMD3<Float>(0, 1, 0), to: SIMD3<Float>(Float(away.x), Float(away.y), Float(away.z)))
+            let yAx = SIMD3<Float>(Float(away.x), Float(away.y), Float(away.z))
+            let nucleus = tail.parent?.simdWorldPosition ?? .zero
+            var toCam = camPos - nucleus
+            toCam -= dot(toCam, yAx) * yAx
+            if length(toCam) < 1e-6 { toCam = abs(yAx.y) < 0.9 ? SIMD3<Float>(0, 1, 0) - yAx.y * yAx : SIMD3<Float>(1, 0, 0) - yAx.x * yAx }
+            let zAx = normalize(toCam)
+            let xAx = cross(yAx, zAx)
+            tail.simdOrientation = simd_quatf(simd_float3x3(columns: (xAx, yAx, zAx)))
             tail.simdScale = SIMD3<Float>(Float(len), Float(len), Float(len))
             tail.simdPosition = .zero          // the tail starts at the nucleus
         }
