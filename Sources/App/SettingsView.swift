@@ -152,7 +152,7 @@ struct CreditsView: View {
 
 /// Settings > Music: on/off, now playing with previous / play-pause / next / repeat-one, and the track
 /// list. Always shuffled among included tracks; ⊖ excludes a track (dimmed, skipped), ⊕ re-includes it;
-/// tapping a row plays that track on repeat.
+/// tapping a row plays that track.
 struct MusicView: View {
     @ObservedObject private var music = AmbientMusic.shared
     @AppStorage(AmbientMusic.enabledKey) private var musicOn = true
@@ -223,7 +223,7 @@ struct MusicView: View {
         return HStack(spacing: 12) {
             Button {
                 musicOn = true
-                music.playOnRepeat(t)
+                music.play(t)
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: isCurrent ? (music.repeatOne ? "repeat.1" : "speaker.wave.2") : "music.note")

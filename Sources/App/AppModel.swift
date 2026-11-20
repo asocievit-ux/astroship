@@ -367,7 +367,7 @@ final class AppModel: ObservableObject {
             viewing = false
             let m = AmbientMusic.shared
             if let t = m.tracks.dropFirst(1).first, m.isIncluded(t) { m.toggleIncluded(t) }
-            if let t = m.tracks.dropFirst(3).first { m.playOnRepeat(t) }
+            if let t = m.tracks.dropFirst(3).first { m.play(t) }
             showSettings = true
             showMusic = true
             return

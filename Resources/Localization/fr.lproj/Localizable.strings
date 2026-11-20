@@ -86,7 +86,7 @@
 "kind.star" = "Étoile";
 "language.system" = "Langue du système";
 "music.exclude" = "Ignorer ce morceau";
-"music.footer" = "Ordre aléatoire. ⊖ ignore un morceau (au moins un reste). Touchez un morceau pour le répéter.";
+"music.footer" = "Ordre aléatoire. ⊖ ignore un morceau (au moins un reste). Touchez un morceau pour l’écouter.";
 "music.include" = "Réinclure ce morceau";
 "music.next" = "Morceau suivant";
 "music.nowPlaying" = "En cours";

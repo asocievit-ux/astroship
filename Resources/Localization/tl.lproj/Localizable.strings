@@ -86,7 +86,7 @@
 "kind.star" = "Bituin";
 "language.system" = "Default ng system";
 "music.exclude" = "Laktawan ang track na ito";
-"music.footer" = "Random ang pagkakasunod. ⊖ para laktawan ang track (may matitirang isa). I-tap ang track para ulitin.";
+"music.footer" = "Random ang pagkakasunod. ⊖ para laktawan ang track (may matitirang isa). I-tap ang track para i-play.";
 "music.include" = "Isama muli ang track";
 "music.next" = "Susunod na track";
 "music.nowPlaying" = "Tumutugtog";

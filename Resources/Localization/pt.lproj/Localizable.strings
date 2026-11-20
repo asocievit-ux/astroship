@@ -86,7 +86,7 @@
 "kind.star" = "Estrela";
 "language.system" = "Padrão do sistema";
 "music.exclude" = "Pular esta faixa";
-"music.footer" = "Ordem aleatória. ⊖ pula uma faixa (pelo menos uma fica). Toque numa faixa para repeti-la.";
+"music.footer" = "Ordem aleatória. ⊖ pula uma faixa (pelo menos uma fica). Toque numa faixa para tocá-la.";
 "music.include" = "Incluir de novo";
 "music.next" = "Próxima faixa";
 "music.nowPlaying" = "Tocando agora";

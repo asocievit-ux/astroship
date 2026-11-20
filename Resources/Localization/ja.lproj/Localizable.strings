@@ -86,7 +86,7 @@
 "kind.star" = "恒星";
 "language.system" = "システム設定";
 "music.exclude" = "この曲を再生しない";
-"music.footer" = "ランダム再生。⊖で曲を外せます（最低1曲は残ります）。曲をタップするとその曲をリピート。";
+"music.footer" = "ランダム再生。⊖で曲を外せます（最低1曲は残ります）。曲をタップするとその曲を再生します。";
 "music.include" = "この曲を再生する";
 "music.next" = "次の曲";
 "music.nowPlaying" = "再生中";

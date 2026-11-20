@@ -86,7 +86,7 @@
 "kind.star" = "Estrella";
 "language.system" = "Predeterminado del sistema";
 "music.exclude" = "Omitir esta pista";
-"music.footer" = "Orden aleatorio. ⊖ omite una pista (queda al menos una). Toca una pista para repetirla.";
+"music.footer" = "Orden aleatorio. ⊖ omite una pista (queda al menos una). Toca una pista para reproducirla.";
 "music.include" = "Volver a incluir";
 "music.next" = "Siguiente pista";
 "music.nowPlaying" = "Reproduciendo";

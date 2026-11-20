@@ -4,7 +4,7 @@ import Foundation
 /// Background music: every audio file in the bundle's Audio folder (Resources/Audio, licences in
 /// docs/licenses.md) played as an endless playlist, always shuffled among the tracks the user has not
 /// excluded (minus button in the music screen), reshuffled each cycle without back-to-back repeats.
-/// Tapping a track in the music screen plays it in repeat-one mode. Adding a track = dropping a
+/// Tapping a track in the music screen plays it; the shuffle then continues. Adding a track = dropping a
 /// 44.1 kHz stereo file in Resources/Audio (tools/add_bgm.sh) and a line in `BGMCatalog`.
 /// Session category .playback: plays even with the silent switch on (user request); the hardware
 /// volume buttons set the level. Pauses in the background.
@@ -122,10 +122,10 @@ final class AmbientMusic: ObservableObject {
         UserDefaults.standard.set(Array(excluded).sorted(), forKey: Self.excludedKey)
     }
 
-    /// Tapping a row: play it on repeat-one (re-including it if it was excluded).
-    func playOnRepeat(_ t: BGMTrack) {
+    /// Tapping a row: play that track now (re-including it if it was excluded); afterwards the shuffle
+    /// continues (the repeat-one button is left as it is).
+    func play(_ t: BGMTrack) {
         if excluded.contains(t.id) { toggleIncluded(t) }
-        repeatOne = true
         if !Self.enabled { UserDefaults.standard.set(true, forKey: Self.enabledKey); objectWillChange.send() }
         skip(to: t)
     }

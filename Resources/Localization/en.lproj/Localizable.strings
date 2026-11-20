@@ -86,7 +86,7 @@
 "kind.star" = "Star";
 "language.system" = "System default";
 "music.exclude" = "Skip this track";
-"music.footer" = "Plays in random order. ⊖ skips a track (at least one stays on). Tap a track to repeat it.";
+"music.footer" = "Plays in random order. ⊖ skips a track (at least one stays on). Tap a track to play it.";
 "music.include" = "Play this track again";
 "music.next" = "Next track";
 "music.nowPlaying" = "Now playing";
