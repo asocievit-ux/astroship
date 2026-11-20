@@ -121,20 +121,25 @@ enum Geo {
                 let r = Float(raw[o + 16]) / 255, g = Float(raw[o + 17]) / 255, b = Float(raw[o + 18]) / 255
                 let d = simd_normalize(SIMD3<Float>(x, y, z))
                 // angular half-size (radians) and brightness from magnitude
-                let size = 0.0011 * powf(10, -0.11 * (mag - 6))
-                let bright = min(1, max(0.12, 0.25 + (6.2 - mag) * 0.16))
+                let expo: Float = -0.11 * (mag - 6)
+                let size: Float = 0.0011 * powf(10, expo)
+                let lin: Float = 0.25 + (6.2 - mag) * 0.16
+                let bright: Float = min(1, max(0.12, lin))
                 var up = SIMD3<Float>(0, 0, 1)
                 if abs(simd_dot(up, d)) > 0.95 { up = SIMD3<Float>(1, 0, 0) }
                 let e1 = simd_normalize(simd_cross(up, d)) * size
                 let e2 = simd_normalize(simd_cross(d, e1)) * size
                 let base = UInt32(pos.count)
-                let c = d * 0.995
-                for (p, t) in [(c - e1 - e2, CGPoint(x: 0, y: 0)), (c + e1 - e2, CGPoint(x: 1, y: 0)),
-                               (c + e1 + e2, CGPoint(x: 1, y: 1)), (c - e1 + e2, CGPoint(x: 0, y: 1))] {
-                    pos.append(SCNVector3(p.x, p.y, p.z)); uv.append(t)
-                    col.append(SIMD4<Float>(r * bright, g * bright, b * bright, 1))
+                let c: SIMD3<Float> = d * 0.995
+                let corners: [SIMD3<Float>] = [c - e1 - e2, c + e1 - e2, c + e1 + e2, c - e1 + e2]
+                let uvs: [CGPoint] = [CGPoint(x: 0, y: 0), CGPoint(x: 1, y: 0), CGPoint(x: 1, y: 1), CGPoint(x: 0, y: 1)]
+                let rgba = SIMD4<Float>(r * bright, g * bright, b * bright, 1)
+                for k in 0..<4 {
+                    let p = corners[k]
+                    pos.append(SCNVector3(p.x, p.y, p.z)); uv.append(uvs[k]); col.append(rgba)
                 }
-                idx += [base, base + 1, base + 2, base, base + 2, base + 3]
+                let quad: [UInt32] = [base, base + 1, base + 2, base, base + 2, base + 3]
+                idx.append(contentsOf: quad)
             }
         }
         let colorData = col.withUnsafeBufferPointer { Data(buffer: $0) }
