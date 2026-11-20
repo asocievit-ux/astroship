@@ -97,6 +97,7 @@
 "settings.dwarfs" = "Dwarf planets & asteroids";
 "settings.labels" = "Names and markers";
 "settings.moons" = "Moons";
+"settings.music" = "Music (528 Hz)";
 "settings.orbits" = "Orbits (Sun-centered)";
 "settings.scaleNote" = "Sizes and distances are true to scale. Planets are tiny compared with the space between them, so glowing rings mark where they are. Tap a name to fly there.";
 "settings.title" = "Settings";

@@ -97,6 +97,7 @@
 "settings.dwarfs" = "Planetas enanos y asteroides";
 "settings.labels" = "Nombres y marcas";
 "settings.moons" = "Satélites";
+"settings.music" = "Música (528 Hz)";
 "settings.orbits" = "Órbitas (centrado en el Sol)";
 "settings.scaleNote" = "Tamaños y distancias están a escala real. Los planetas son diminutos frente al espacio entre ellos, por eso los anillos luminosos marcan dónde están. Toca un nombre para volar allí.";
 "settings.title" = "Ajustes";

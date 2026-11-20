@@ -6,11 +6,14 @@ struct SettingsView: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var store: RemoveAdsStore
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(AmbientMusic.enabledKey) private var musicOn = true
 
     var body: some View {
         NavigationStack {
             Form {
                 Section(L("settings.display")) {
+                    Toggle(L("settings.music"), isOn: $musicOn)
+                        .onChange(of: musicOn) { _, on in AmbientMusic.shared.setEnabled(on) }
                     Toggle(L("settings.orbits"), isOn: $model.options.orbits)
                     Toggle(L("settings.trails"), isOn: $model.options.trails)
                     Toggle(L("settings.moons"), isOn: $model.options.moons)

@@ -97,6 +97,7 @@
 "settings.dwarfs" = "Zwergplaneten & Asteroiden";
 "settings.labels" = "Namen und Markierungen";
 "settings.moons" = "Monde";
+"settings.music" = "Musik (528 Hz)";
 "settings.orbits" = "Bahnen (sonnenzentriert)";
 "settings.scaleNote" = "Größen und Entfernungen sind maßstabsgetreu. Planeten sind winzig im Vergleich zum Raum dazwischen, daher markieren leuchtende Ringe ihre Position. Tippe auf einen Namen, um hinzufliegen.";
 "settings.title" = "Einstellungen";

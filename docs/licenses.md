@@ -11,3 +11,6 @@
 | Dwarf planets, Vesta, comets | JPL Small-Body Database osculating elements | Public (NASA/JPL) |
 | Sun's galactic motion | Θ0 = 230 km/s; (U,V,W) = (11.1, 12.24, 7.25) km/s, Schönrich, Binney & Dehnen 2010; R0 = 8.2 kpc | Published values |
 | Galaxy top view, sun glow, star sprite, app icon | Generated procedurally by `tools/build_assets.py` / icon script | Own work |
+
+## Background music
+`Resources/Audio/ambient528.m4a` is an original ambient loop synthesised from scratch by `tools/make_music.py` (sine partials around 528 Hz plus shaped noise). No samples or third-party music are used.

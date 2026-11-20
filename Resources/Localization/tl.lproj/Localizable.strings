@@ -97,6 +97,7 @@
 "settings.dwarfs" = "Planetang unano at asteroid";
 "settings.labels" = "Mga pangalan at marka";
 "settings.moons" = "Mga buwan";
+"settings.music" = "Musika (528 Hz)";
 "settings.orbits" = "Mga orbit (sa Araw)";
 "settings.scaleNote" = "Totoo sa sukat ang laki at layo. Napakaliit ng mga planeta kumpara sa espasyo sa pagitan nila, kaya may kumikinang na singsing na nagmamarka sa kanila. I-tap ang pangalan para lumipad doon.";
 "settings.title" = "Settings";

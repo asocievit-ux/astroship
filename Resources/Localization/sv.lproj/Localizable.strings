@@ -97,6 +97,7 @@
 "settings.dwarfs" = "Dvärgplaneter";
 "settings.labels" = "Namn och markörer";
 "settings.moons" = "Månar";
+"settings.music" = "Musik (528 Hz)";
 "settings.orbits" = "Banor (solcentrerad)";
 "settings.scaleNote" = "Storlekar och avstånd är skalenliga. Planeterna är små jämfört med rymden mellan dem, så lysande ringar visar var de är. Tryck på ett namn för att flyga dit.";
 "settings.title" = "Inställningar";

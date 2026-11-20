@@ -97,6 +97,7 @@
 "settings.dwarfs" = "Planètes naines et astéroïdes";
 "settings.labels" = "Noms et repères";
 "settings.moons" = "Satellites";
+"settings.music" = "Musique (528 Hz)";
 "settings.orbits" = "Orbites (centré Soleil)";
 "settings.scaleNote" = "Tailles et distances sont à l'échelle réelle. Les planètes sont minuscules face à l'espace qui les sépare : des anneaux lumineux indiquent leur position. Touchez un nom pour y aller.";
 "settings.title" = "Réglages";
