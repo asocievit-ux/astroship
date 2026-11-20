@@ -62,23 +62,26 @@ struct TopBar: View {
                         Text(L("time.live")).font(.caption2.weight(.bold)).foregroundStyle(Color.red)
                     }
                 }
-                Text(model.dateText).font(.caption.monospacedDigit()).foregroundStyle(.white)
-                    .lineLimit(2).minimumScaleFactor(0.7).multilineTextAlignment(.leading)
+                Text(model.dateText.isEmpty ? " \n " : model.dateText)
+                    .font(.caption.monospacedDigit()).foregroundStyle(.white)
+                    .lineLimit(2).multilineTextAlignment(.leading)
+                    .fixedSize()
             }
             .padding(.horizontal, 12).padding(.vertical, 6)
             .glass()
+            .layoutPriority(2)
             Spacer(minLength: 4)
-            // All top controls in one row (mode switch | settings, galaxy, viewing mode), one glass capsule.
+            // All top controls in one row: mode switch (Saturn = heliocentric, helix = galactic) | tour,
+            // galaxy map, settings (far right). Viewing mode moved to the bottom bar (eye).
             HStack(spacing: 2) {
                 ModeToggle(embedded: true)
                 Rectangle().fill(Color.white.opacity(0.25)).frame(width: 1, height: 22).padding(.horizontal, 3)
-                IconButton(system: "point.topleft.down.to.point.bottomright.curvepath", label: L("tour.start"), embedded: true) { model.startTour() }
-                IconButton(system: "gearshape", label: L("settings.title"), embedded: true) { model.showSettings = true }
-                IconButton(system: "hurricane", label: L("galaxy.title"), embedded: true) { model.showGalaxy = true }
-                Button { model.viewing = true } label: {
-                    SaturnGlyph().frame(width: 38, height: 36)
+                Button { model.startTour() } label: {
+                    RocketGlyph().frame(width: 38, height: 36).contentShape(Rectangle())
                 }
-                .accessibilityLabel(L("view.mode"))
+                .accessibilityLabel(L("tour.start"))
+                IconButton(system: "hurricane", label: L("galaxy.title"), embedded: true) { model.showGalaxy = true }
+                IconButton(system: "gearshape", label: L("settings.title"), embedded: true) { model.showSettings = true }
             }
             .padding(3)
             .glass()
@@ -94,15 +97,18 @@ struct ModeToggle: View {
     var embedded = false
     var body: some View {
         let row = HStack(spacing: 2) {
-            seg(.heliocentric, "sun.max", L("frame.sun"))
+            seg(.heliocentric, nil, L("frame.sun"))
             seg(.galactic, "tornado", L("frame.galaxy"))
         }
         if embedded { row } else { row.padding(3).glass() }
     }
-    private func seg(_ m: FrameMode, _ icon: String, _ label: String) -> some View {
+    private func seg(_ m: FrameMode, _ icon: String?, _ label: String) -> some View {
         let on = model.mode == m
         return Button { model.mode = m } label: {
-            Image(systemName: icon).font(.system(size: 16, weight: .regular))
+            Group {
+                if let icon { Image(systemName: icon).font(.system(size: 16, weight: .regular)) }
+                else { SaturnGlyph(ring: on ? Color.black : Color.white.opacity(0.9)) }
+            }
                 .frame(width: 40, height: 36)
                 .foregroundStyle(on ? Color.black : Color.white)
                 .background(on ? Color.white.opacity(0.9) : Color.clear, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
@@ -114,15 +120,49 @@ struct ModeToggle: View {
 
 /// Small Saturn drawing (SF Symbols has none): planet disc with a tilted ring.
 struct SaturnGlyph: View {
+    var ring: Color = Color.white.opacity(0.9)
     var body: some View {
         ZStack {
-            Ellipse().stroke(Color.white.opacity(0.9), lineWidth: 1.8)
-                .frame(width: 28, height: 9).rotationEffect(.degrees(-22))
-            Circle().fill(Color(red: 0.93, green: 0.82, blue: 0.6)).frame(width: 13, height: 13)
+            Ellipse().stroke(ring, lineWidth: 1.5)
+                .frame(width: 26, height: 8).rotationEffect(.degrees(-22))
+            Circle().fill(Color(red: 0.93, green: 0.82, blue: 0.6)).frame(width: 12, height: 12)
             // front half of the ring over the disc
-            Ellipse().trim(from: 0, to: 0.5).stroke(Color.white.opacity(0.9), lineWidth: 1.8)
-                .frame(width: 28, height: 9).rotationEffect(.degrees(-22))
+            Ellipse().trim(from: 0, to: 0.5).stroke(ring, lineWidth: 1.5)
+                .frame(width: 26, height: 8).rotationEffect(.degrees(-22))
         }
+    }
+}
+
+/// Thin-line rocket for the tour button (SF Symbols has none), tilted to fly up and to the right.
+struct RocketGlyph: View {
+    var color: Color = .white
+    var body: some View {
+        Canvas { ctx, size in
+            let u = min(size.width, size.height) / 24
+            func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x * u, y: y * u) }
+            ctx.translateBy(x: size.width / 2, y: size.height / 2)
+            ctx.rotate(by: .degrees(45))
+            ctx.translateBy(x: -12 * u, y: -12 * u)
+            var body = Path()
+            body.move(to: p(12, 2.5))
+            body.addCurve(to: p(15.5, 12), control1: p(14.6, 4.6), control2: p(15.5, 8))
+            body.addLine(to: p(15.5, 16.5)); body.addLine(to: p(8.5, 16.5)); body.addLine(to: p(8.5, 12))
+            body.addCurve(to: p(12, 2.5), control1: p(8.5, 8), control2: p(9.4, 4.6))
+            body.closeSubpath()
+            var fins = Path()
+            fins.move(to: p(8.5, 12.5)); fins.addLine(to: p(5.5, 16)); fins.addLine(to: p(5.5, 18.5)); fins.addLine(to: p(8.5, 16.5))
+            fins.move(to: p(15.5, 12.5)); fins.addLine(to: p(18.5, 16)); fins.addLine(to: p(18.5, 18.5)); fins.addLine(to: p(15.5, 16.5))
+            var flame = Path()
+            flame.move(to: p(10.5, 18.5)); flame.addLine(to: p(10.5, 20.5))
+            flame.move(to: p(12, 18.5)); flame.addLine(to: p(12, 22))
+            flame.move(to: p(13.5, 18.5)); flame.addLine(to: p(13.5, 20.5))
+            let style = StrokeStyle(lineWidth: 1.4, lineCap: .round, lineJoin: .round)
+            ctx.stroke(body, with: .color(color), style: style)
+            ctx.stroke(fins, with: .color(color), style: style)
+            ctx.stroke(flame, with: .color(color.opacity(0.8)), style: style)
+            ctx.stroke(Path(ellipseIn: CGRect(x: 10.4 * u, y: 7.6 * u, width: 3.2 * u, height: 3.2 * u)), with: .color(color), style: style)
+        }
+        .frame(width: 22, height: 22)
     }
 }
 
@@ -181,6 +221,17 @@ struct TimeBar: View {
                     .layoutPriority(1)
                 }
             }
+            .glass()
+            Spacer(minLength: 2)
+            Button { model.viewing = true } label: {
+                Image(systemName: "eye")
+                    .font(.system(size: 18, weight: .regular))
+                    .frame(width: 48, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .accessibilityLabel(L("view.mode"))
+            .layoutPriority(2)
+            .foregroundStyle(.white)
             .glass()
         }
         .environment(\.layoutDirection, .leftToRight)   // time arrows keep their physical meaning in RTL
