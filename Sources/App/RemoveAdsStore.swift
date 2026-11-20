@@ -88,7 +88,15 @@ final class RemoveAdsStore: ObservableObject {
             guard let p = found else { unavailable = true; note = L("ads.productUnavailable"); return }
             product = p
             displayPrice = p.displayPrice
-            switch try await p.purchase() {
+            #if os(visionOS)
+            // No ads on visionOS, so the purchase UI is hidden there; StoreKit needs a scene to confirm in.
+            guard let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene
+                ?? UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+            let outcome = try await p.purchase(confirmIn: scene)
+            #else
+            let outcome = try await p.purchase()
+            #endif
+            switch outcome {
             case .success(let result):
                 guard let t = verified(result) else { note = L("ads.purchaseUnverified"); return }
                 await t.finish()
