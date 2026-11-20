@@ -10,8 +10,6 @@ struct ContentView: View {
         ZStack {
             SolarSceneView(model: model)
                 .ignoresSafeArea()
-            LabelsCanvas(viewer: model.viewer, showNames: model.options.labels)
-                .ignoresSafeArea()
             VStack(spacing: 10) {
                 TopBar()
                 if store.premiumNoticeVisible { PremiumBanner() }
@@ -102,7 +100,9 @@ struct TimeBar: View {
                 }
                 .font(.subheadline.weight(.semibold))
                 .padding(.horizontal, 12).frame(height: 44)
+                .contentShape(Rectangle())
             }
+            .accessibilityIdentifier("bodyPickerButton")
             .foregroundStyle(.white)
             .glass()
             Spacer(minLength: 2)

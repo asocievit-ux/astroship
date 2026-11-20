@@ -109,8 +109,6 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
         buildBelt()
         scene.rootNode.addChildNode(beltNode)
         scene.rootNode.addChildNode(sunTrailNode)
-        buildMotionArrow()
-        scene.rootNode.addChildNode(motionArrow)
     }
 
     private func addBody(_ body: Body) {
@@ -319,7 +317,6 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
 
         // The Sun's own straight path and its direction of travel.
         sunTrailNode.isHidden = !show
-        motionArrow.isHidden = !show
         if show {
             if sunTrailNode.geometry == nil {
                 let len = 365.25 * 60 * 86_400
@@ -435,7 +432,7 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
 
         let items = LabelLayout.compute(renderer: self, state: st, cameraPos: camPos, options: options, focus: state.focus)
         state.labels = items
-        state.markers = items.map { ScreenMarker(id: $0.id, point: $0.point) }
+        state.markers = items.map { ScreenMarker(id: $0.id, point: $0.point, radius: $0.radius) }
 
         if now - lastSnapshot > 0.25 {
             lastSnapshot = now

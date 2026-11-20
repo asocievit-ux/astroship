@@ -112,12 +112,11 @@ final class GalaxyRenderer: NSObject, SCNSceneRendererDelegate {
         let dir = simd_normalize(SIMD3<Float>(Float(-v.y), Float(v.z), Float(-v.x)))
         arrow.simdOrientation = simd_quatf(from: SIMD3<Float>(0, 1, 0), to: dir)
         arrow.simdPosition = Self.sunScene
-        scene.rootNode.addChildNode(arrow)
+        _ = arrow   // direction arrow removed by request (v3); kept out of the scene
 
         labels = [
             (L("galaxy.sun"), Self.sunScene),
             (L("galaxy.center"), SIMD3<Float>(0, 0.4, 0)),
-            (L("galaxy.direction"), Self.sunScene + dir * (arrowLen + 0.6)),
             (L("galaxy.perseus"), armPoint(r: 10.5, offsetAngle: 0.0)),
             (L("galaxy.sagittarius"), armPoint(r: 6.6, offsetAngle: 0.0)),
             (L("galaxy.scutum"), armPoint(r: 10.5, offsetAngle: .pi)),

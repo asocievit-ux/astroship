@@ -7,9 +7,7 @@ import AstroCore
 struct LabelItem {
     var id: BodyID
     var point: CGPoint          // UIKit points, origin top-left
-    var ring: Bool              // body is smaller than a few pixels: draw a glowing ring
-    var labelOffset: CGFloat    // distance below the point for the name
-    var major: Bool
+    var radius: CGFloat         // on-screen disc radius in points
 }
 
 /// Decides which bodies get a ring and a name, so planets far smaller than a pixel at true scale
@@ -37,7 +35,6 @@ enum LabelLayout {
     static func compute(renderer: SolarRenderer, state: EphemerisState, cameraPos: SIMD3<Float>,
                         options: DisplayOptions, focus: BodyID) -> [LabelItem] {
         let viewSize = renderer.state.viewSize
-        var placed: [CGPoint] = []
         var items: [LabelItem] = []
         let fovHalfTan = tan(renderer.cameraFovRadians / 2)
         for body in orderCache[focus] ?? Catalog.all {
@@ -55,45 +52,37 @@ enum LabelLayout {
             guard let (pt, depth) = renderer.project(p, viewSize: viewSize) else { continue }
             guard pt.x > -40, pt.x < viewSize.width + 40, pt.y > -40, pt.y < viewSize.height + 40 else { continue }
             let pixR = CGFloat(Float(body.radiusKm / SolarRenderer.unitKm) / (depth * fovHalfTan)) * viewSize.height / 2
-            if body.id != focus, placed.contains(where: { hypot($0.x - pt.x, $0.y - pt.y) < 16 }) { continue }
-            placed.append(pt)
-            items.append(LabelItem(id: body.id, point: pt, ring: pixR < 6,
-                                   labelOffset: max(11, min(pixR, viewSize.height * 0.4) + 5),
-                                   major: body.kind == .planet || body.kind == .star))
+            items.append(LabelItem(id: body.id, point: pt, radius: min(pixR, viewSize.height)))
         }
         return items
     }
 }
 
-/// Draws the rings and names every display frame from the latest render-thread layout.
-struct LabelsCanvas: View {
-    let viewer: ViewerState
-    let showNames: Bool
+/// Picks the body for a tap. Bodies are usually far smaller than a pixel at true scale and have no
+/// on-screen marker, so every visible body gets a generous invisible hit area around its disc.
+enum TapPicker {
+    static let slop: CGFloat = 44
 
-    private static let names: [String] = Catalog.all.map { $0.id.localizedName }
-    private static let colors: [Color] = Catalog.all.map { Color(red: $0.color.0, green: $0.color.1, blue: $0.color.2) }
-
-    var body: some View {
-        TimelineView(.animation) { _ in
-            Canvas { ctx, _ in
-                for item in viewer.labels {
-                    let c = Self.colors[item.id.rawValue]
-                    if item.ring {
-                        let r: CGFloat = item.major ? 7 : 5
-                        let rect = CGRect(x: item.point.x - r, y: item.point.y - r, width: 2 * r, height: 2 * r)
-                        ctx.fill(Path(ellipseIn: rect.insetBy(dx: -3, dy: -3)), with: .color(c.opacity(0.12)))
-                        ctx.fill(Path(ellipseIn: rect), with: .color(c.opacity(0.22)))
-                        ctx.stroke(Path(ellipseIn: rect), with: .color(c.opacity(0.95)), lineWidth: 1.5)
-                    }
-                    if showNames {
-                        let text = Text(Self.names[item.id.rawValue])
-                            .font(.system(size: item.major ? 13 : 11, weight: item.major ? .semibold : .medium))
-                            .foregroundColor(.white.opacity(item.major ? 0.95 : 0.75))
-                        ctx.draw(text, at: CGPoint(x: item.point.x, y: item.point.y + item.labelOffset), anchor: .top)
-                    }
-                }
+    static func pick(at p: CGPoint, markers: [ScreenMarker], focus: BodyID) -> BodyID? {
+        var best: (BodyID, CGFloat)?
+        for m in markers {
+            let d = hypot(m.point.x - p.x, m.point.y - p.y)
+            let edge = max(0, d - m.radius)
+            guard edge < slop else { continue }
+            // Prefer the big, important bodies when several hit areas overlap.
+            let b = Catalog.body(m.id)
+            var penalty: CGFloat
+            switch b.kind {
+            case .star, .planet: penalty = 0
+            case .dwarf: penalty = 4
+            case .comet: penalty = 6
+            case .moon: penalty = 8
             }
+            if m.id == focus { penalty += 2 }   // tapping near the focused body usually means "something else"
+            if d <= m.radius { penalty = -1 }   // directly on a visible disc always wins
+            let score = edge + penalty
+            if score < (best?.1 ?? .infinity) { best = (m.id, score) }
         }
-        .allowsHitTesting(false)
+        return best?.0
     }
 }

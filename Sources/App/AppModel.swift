@@ -71,7 +71,48 @@ final class AppModel: ObservableObject {
         viewer.mode = mode
         viewer.options = options
         let args = ProcessInfo.processInfo.arguments
-        if let i = args.firstIndex(of: "-shot"), i + 1 < args.count { applyScreenshot(args[i + 1]) }
+        if let i = args.firstIndex(of: "-shot"), i + 1 < args.count {
+            applyScreenshot(args[i + 1])
+        } else {
+            applyOpeningView()
+        }
+    }
+
+    /// Opening view on every cold start: the whole solar system sailing through the Milky Way.
+    /// Galactic frame, camera ahead of the Sun looking back along its path so the planets' helical
+    /// trails recede into the distance, and time running at one month per second.
+    func applyOpeningView() {
+        mode = .galactic
+        viewer.mode = .galactic
+        viewer.focus = .sun; focus = .sun
+        viewer.distanceKm = Self.openingDistanceKm
+        let (yaw, pitch) = Self.openingAngles()
+        viewer.yaw = yaw; viewer.pitch = pitch
+        setRate(Self.openingRate)
+    }
+
+    static let openingRate = 2_629_800.0          // 1 month per second
+    static let openingDistanceKm = 1.6e9          // about 11 AU
+
+    /// Camera direction about 35 degrees off the Sun's direction of travel, tilted up a little.
+    static func openingAngles() -> (Double, Double) {
+        let v = normalize(Frames.eclToScene * GalacticMotion.velocityEcliptic)
+        let up = SIMD3<Double>(0, 1, 0)
+        var side = cross(v, up)
+        if length(side) < 1e-6 { side = SIMD3<Double>(1, 0, 0) }
+        side = normalize(side)
+        let a = 35.0 * .pi / 180
+        var d = v * cos(a) + side * sin(a)
+        d = normalize(d + up * 0.25)
+        return (atan2(d.x, d.z), asin(max(-1, min(1, d.y))))
+    }
+
+    /// Tap on the 3D view: nearest body within a generous hit area. Returns false if nothing is near.
+    @discardableResult
+    func handleTap(at p: CGPoint) -> Bool {
+        guard let id = TapPicker.pick(at: p, markers: viewer.markers, focus: viewer.focus) else { return false }
+        select(id)
+        return true
     }
 
     func noteInteraction() { interacted = true }
@@ -174,6 +215,31 @@ final class AppModel: ObservableObject {
             mode = .galactic
         case "galaxy":
             showGalaxy = true
+        case "opening":
+            applyOpeningView()
+            return
+        case "tap":
+            // Inner solar system; after 3 s simulate a tap 18 pt away from Mars (no marker on screen).
+            viewer.focus = .sun; focus = .sun
+            viewer.distanceKm = 5.5e8; viewer.yaw = 0.4; viewer.pitch = 0.9
+            mode = .heliocentric
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+                if let m = viewer.markers.first(where: { $0.id == .mars }) {
+                    handleTap(at: CGPoint(x: m.point.x + 18, y: m.point.y - 10))
+                }
+            }
+        case "picker":
+            showPicker = true
+        case "fly":
+            // Same call the body list makes: fly from the Sun to Jupiter after 2 s.
+            viewer.focus = .sun; focus = .sun
+            viewer.distanceKm = 5.5e8; viewer.yaw = 0.4; viewer.pitch = 0.9
+            mode = .heliocentric
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                select(.jupiter)
+            }
         default: break
         }
         viewer.mode = mode

@@ -11,7 +11,6 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section(L("settings.display")) {
-                    Toggle(L("settings.labels"), isOn: $model.options.labels)
                     Toggle(L("settings.orbits"), isOn: $model.options.orbits)
                     Toggle(L("settings.trails"), isOn: $model.options.trails)
                     Toggle(L("settings.moons"), isOn: $model.options.moons)

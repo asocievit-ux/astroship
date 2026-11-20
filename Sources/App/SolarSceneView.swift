@@ -76,13 +76,7 @@ struct SolarSceneView: UIViewRepresentable {
             model.noteInteraction()
             guard let v = g.view as? SCNView else { return }
             let p = g.location(in: v)
-            let markers = model.viewer.markers
-            var best: (BodyID, CGFloat)?
-            for m in markers {
-                let d = hypot(m.point.x - p.x, m.point.y - p.y)
-                if d < 34, d < (best?.1 ?? .infinity) { best = (m.id, d) }
-            }
-            if let id = best?.0 { model.select(id); return }
+            if model.handleTap(at: p) { return }
             let hits = v.hitTest(p, options: [.searchMode: SCNHitTestSearchMode.closest.rawValue])
             if let name = hits.first?.node.name, let id = BodyID.allCases.first(where: { $0.key == name }) {
                 model.select(id)

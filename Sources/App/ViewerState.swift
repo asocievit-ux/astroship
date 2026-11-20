@@ -27,6 +27,7 @@ struct FlyTransition {
 struct ScreenMarker {
     var id: BodyID
     var point: CGPoint   // UIKit coordinates (origin top-left)
+    var radius: CGFloat  // on-screen radius of the body's disc (points)
 }
 
 /// State shared between the main thread (gestures, UI) and SceneKit's render thread.
