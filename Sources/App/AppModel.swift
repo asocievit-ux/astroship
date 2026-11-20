@@ -95,6 +95,7 @@ final class AppModel: ObservableObject {
         viewer.yaw = yaw; viewer.pitch = pitch
         setRate(Self.openingRate)
         showInfo = false            // clean galaxy view at launch; tapping a body opens its card
+        viewing = true              // launch in viewing mode: only the scene; a tap brings the controls back
     }
 
     static let openingRate = 2_629_800.0          // 1 month per second
@@ -248,7 +249,11 @@ final class AppModel: ObservableObject {
             debugStats = true
         case "viewing":
             applyOpeningView()
-            viewing = true
+            return
+        case "controls":
+            // Opening view after the first tap: controls visible.
+            applyOpeningView()
+            viewing = false
             return
         case "picker":
             showPicker = true
