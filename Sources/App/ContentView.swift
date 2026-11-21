@@ -29,9 +29,13 @@ struct ContentView: View {
                 .transition(.opacity)
             }
             if model.sleepMessageVisible {
-                SleepMessageBanner { model.dismissSleepMessage() }
-                    .transition(.opacity)
-                    .zIndex(1)
+                VStack {
+                    SleepMessageBanner { model.dismissSleepMessage() }
+                        .padding(.top, 160)
+                    Spacer()
+                }
+                .transition(.opacity)
+                .zIndex(1)
             }
         }
         .animation(.easeInOut(duration: 0.25), value: model.viewing)

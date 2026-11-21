@@ -6,14 +6,18 @@ import simd
 /// behind the Sun. Positions are heliocentric ecliptic J2000, kilometres.
 public enum SleepFraming {
     /// Behind Saturn, away from the Sun.
-    public static let backKm = 320_000.0
-    /// North of the Saturn–Sun line, so Saturn falls below centre and the rings tilt.
-    public static let heightKm = 200_000.0
-    /// A slight side offset so the rings are not seen dead-on.
-    public static let sideKm = 90_000.0
-    /// Look-at, just ahead of Saturn toward the Sun — keeps Saturn in the lower-middle and the
-    /// Sun in the upper part of a 50° field of view.
-    public static let lookAheadKm = 280_000.0
+    public static let backKm = 400_000.0
+    /// Modestly north of the Saturn–Sun line: enough to put Saturn below centre and the Sun
+    /// above, but not so high that the camera looks down on the pole.
+    public static let heightKm = 130_000.0
+    /// A slight side offset so the Sun sits a little to the right of Saturn, as in the
+    /// reference framing, and the rings are not seen dead-on.
+    public static let sideKm = 20_000.0
+    /// Look-at, ahead of Saturn toward the Sun.
+    public static let lookAheadKm = 400_000.0
+    /// Drop the look-at south of the Saturn–Sun line so the Sun stays in the upper part of
+    /// a 50° field of view without raising the camera further.
+    public static let dropKm = 40_000.0
 
     public struct Pose: Equatable, Sendable {
         public var position: V3
@@ -29,7 +33,7 @@ public enum SleepFraming {
         // ecliptic-north component perpendicular to the Saturn–Sun line
         let above = normalize(cross(right, toSun))
         let position = saturn - toSun * backKm + above * heightKm + right * sideKm
-        let lookAt = saturn + toSun * lookAheadKm
+        let lookAt = saturn + toSun * lookAheadKm - above * dropKm
         return Pose(position: position, lookAt: lookAt)
     }
 

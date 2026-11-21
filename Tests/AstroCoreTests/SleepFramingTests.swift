@@ -19,8 +19,8 @@ final class SleepFramingTests: XCTestCase {
         // Saturn large in the lower half; the Sun in the upper half.
         let satEl = SleepFraming.elevationDegrees(of: saturn, camera: pose)
         let sunEl = SleepFraming.elevationDegrees(of: sun, camera: pose)
-        XCTAssertLessThan(satEl, -8)
-        XCTAssertGreaterThan(satEl, -22)
+        XCTAssertLessThan(satEl, -4)
+        XCTAssertGreaterThan(satEl, -12)
         XCTAssertGreaterThan(sunEl, 10)
         XCTAssertLessThan(sunEl, 25)
 
