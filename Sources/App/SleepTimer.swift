@@ -20,6 +20,12 @@ final class SleepTimer: ObservableObject {
 
     private var timer: Timer?
 
+    /// Start (or restart) a timer of `m` minutes. Setting `minutes` alone would no-op if it is
+    /// already that value.
+    func start(minutes m: Int) {
+        if minutes == m { restart() } else { minutes = m }
+    }
+
     private func restart() {
         timer?.invalidate(); timer = nil
         guard minutes > 0 else { endDate = nil; return }

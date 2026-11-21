@@ -28,8 +28,14 @@ struct ContentView: View {
                 .id(lang.code)
                 .transition(.opacity)
             }
+            if model.sleepMessageVisible {
+                SleepMessageBanner { model.dismissSleepMessage() }
+                    .transition(.opacity)
+                    .zIndex(1)
+            }
         }
         .animation(.easeInOut(duration: 0.25), value: model.viewing)
+        .animation(.easeInOut(duration: 0.6), value: model.sleepMessageVisible)
         #if os(iOS)
         .statusBarHidden(model.viewing)
         #endif
@@ -47,6 +53,25 @@ struct ContentView: View {
         .fullScreenCover(isPresented: $model.showGalaxy) {
             GalaxyScreen().environmentObject(model).appLanguage(lang).id(lang.code)
         }
+    }
+}
+
+
+struct SleepMessageBanner: View {
+    var onDismiss: () -> Void
+    var body: some View {
+        Text(L("sleep.started"))
+            .font(.body)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 22)
+            .padding(.vertical, 16)
+            .frame(maxWidth: 420)
+            .glass()
+            .contentShape(Rectangle())
+            .padding(.horizontal, 28)
+            .onTapGesture(perform: onDismiss)
+            .accessibilityAddTraits(.isStaticText)
+            .accessibilityAction(named: L("common.close"), onDismiss)
     }
 }
 

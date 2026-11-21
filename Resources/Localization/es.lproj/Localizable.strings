@@ -117,8 +117,10 @@
 "settings.trails" = "Estelas en hélice (viaje galáctico)";
 "settings.version" = "Versión";
 "sleep.minutes" = "%@ min";
+"sleep.mode" = "Sueño";
 "sleep.off" = "Desactivado";
 "sleep.remaining" = "Se detiene en %@";
+"sleep.started" = "Se ha iniciado el modo de sueño. En 30 minutos la música se detendrá y la pantalla se apagará.";
 "sleep.title" = "Temporizador de sueño";
 "speed.dayPerSec" = "1 día/s";
 "speed.decadePerSec" = "10 años/s";

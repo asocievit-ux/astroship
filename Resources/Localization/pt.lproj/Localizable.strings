@@ -117,8 +117,10 @@
 "settings.trails" = "Rastros em hélice (viagem galáctica)";
 "settings.version" = "Versão";
 "sleep.minutes" = "%@ min";
+"sleep.mode" = "Sono";
 "sleep.off" = "Desligado";
 "sleep.remaining" = "Para em %@";
+"sleep.started" = "O modo de sono começou. Em 30 minutos a música para e a tela apaga.";
 "sleep.title" = "Timer de sono";
 "speed.dayPerSec" = "1 dia/s";
 "speed.decadePerSec" = "10 anos/s";

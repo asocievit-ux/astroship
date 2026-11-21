@@ -117,8 +117,10 @@
 "settings.trails" = "Schraubenspuren (Reise durch die Galaxis)";
 "settings.version" = "Version";
 "sleep.minutes" = "%@ Min.";
+"sleep.mode" = "Schlaf";
 "sleep.off" = "Aus";
 "sleep.remaining" = "Stopp in %@";
+"sleep.started" = "Schlafmodus gestartet. In 30 Minuten stoppt die Musik und der Bildschirm schaltet sich aus.";
 "sleep.title" = "Schlaftimer";
 "speed.dayPerSec" = "1 Tag/s";
 "speed.decadePerSec" = "10 Jahre/s";

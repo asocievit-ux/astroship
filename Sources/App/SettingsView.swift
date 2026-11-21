@@ -27,6 +27,19 @@ struct SettingsView: View {
                     }
                 }
                 Section(L("settings.display")) {
+                    Button {
+                        model.startSleepMode()
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "moon.zzz").foregroundStyle(.secondary).frame(width: 22)
+                            Text(L("sleep.mode"))
+                            Spacer()
+                        }
+                        .contentShape(Rectangle())
+                        .foregroundStyle(.primary)
+                    }
+                    .buttonStyle(.plain)
                     NavigationLink { MusicView() } label: {
                         HStack(spacing: 12) {
                             Image(systemName: "music.note").foregroundStyle(.secondary).frame(width: 22)

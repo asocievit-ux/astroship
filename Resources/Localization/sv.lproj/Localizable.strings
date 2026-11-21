@@ -117,8 +117,10 @@
 "settings.trails" = "Spiralspår (färd i galaxen)";
 "settings.version" = "Version";
 "sleep.minutes" = "%@ min";
+"sleep.mode" = "Sömn";
 "sleep.off" = "Av";
 "sleep.remaining" = "Stoppar om %@";
+"sleep.started" = "Viloläget har startat. Om 30 minuter stannar musiken och skärmen släcks.";
 "sleep.title" = "Insomningstimer";
 "speed.dayPerSec" = "1 dag/s";
 "speed.decadePerSec" = "10 år/s";

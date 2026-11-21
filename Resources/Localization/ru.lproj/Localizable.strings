@@ -117,8 +117,10 @@
 "settings.trails" = "Спиральные следы (полёт в Галактике)";
 "settings.version" = "Версия";
 "sleep.minutes" = "%@ мин";
+"sleep.mode" = "Сон";
 "sleep.off" = "Выкл.";
 "sleep.remaining" = "Остановка через %@";
+"sleep.started" = "Режим сна включён. Через 30 минут музыка остановится, и экран погаснет.";
 "sleep.title" = "Таймер сна";
 "speed.dayPerSec" = "1 день/с";
 "speed.decadePerSec" = "10 лет/с";

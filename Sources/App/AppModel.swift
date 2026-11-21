@@ -75,6 +75,9 @@ final class AppModel: ObservableObject {
     @Published var showInfo = true
     /// Viewing mode: every bar and card hidden, only the scene. Any tap brings the controls back.
     @Published var viewing = false
+    /// Brief on-screen note shown when Sleep mode starts (about 10 seconds, then fades).
+    @Published var sleepMessageVisible = false
+    private var sleepMessageTask: Task<Void, Never>?
     /// Km travelled through the galaxy since the app was opened (real time).
     @Published var travelledKm = 0.0
     private let openedAt = Date()
@@ -110,6 +113,7 @@ final class AppModel: ObservableObject {
     /// Galactic frame, camera ahead of the Sun looking back along its path so the planets' helical
     /// trails recede into the distance, and time running at one month per second.
     func applyOpeningView() {
+        viewer.sleepFraming = false
         mode = .galactic
         viewer.mode = .galactic
         if !options.trails { options.trails = true }   // the opening view is all about the trails
@@ -158,6 +162,7 @@ final class AppModel: ObservableObject {
     private var optionsBeforeTour: DisplayOptions?
 
     func startTour(at index: Int = 0) {
+        releaseSleepFraming()
         viewing = true           // hide every bar and card, like viewing mode
         showInfo = false
         touring = true
@@ -185,9 +190,83 @@ final class AppModel: ObservableObject {
     }
 
     func select(_ id: BodyID) {
+        releaseSleepFraming()
         viewer.flyTo(id)
         focus = id
         showInfo = true
+    }
+
+    // MARK: Sleep mode
+
+    /// Settings > Sleep: close Settings, settle on the Saturn-looking-inward view, run time at 1×
+    /// (now / LIVE), start "Revelation of the Misty Planet" then continue the playlist, start a
+    /// 30-minute sleep timer (music fades, the device may auto-lock; the app does not call exit()),
+    /// and show a short on-screen note.
+    func startSleepMode(showMessage: Bool = true, holdMessage: Bool = false) {
+        endTour(restoreControls: false)
+        showSettings = false
+        showMusic = false
+        showPicker = false
+        showGalaxy = false
+        showInfo = false
+        viewing = true
+        mode = .heliocentric
+        if !options.belt { options.belt = true }
+        options.orbits = false
+        viewer.fly = nil
+        viewer.focus = .saturn
+        focus = .saturn
+        viewer.sleepFraming = true
+        goLive()
+        setRate(1)
+        let music = AmbientMusic.shared
+        music.repeatOne = false
+        if let t = music.tracks.first(where: { $0.id == "bgm4" }) {
+            music.play(t)
+        } else {
+            music.setEnabled(true)
+        }
+        SleepTimer.shared.start(minutes: 30)
+        presentSleepMessage(show: showMessage, hold: holdMessage)
+    }
+
+    func dismissSleepMessage() {
+        sleepMessageTask?.cancel()
+        sleepMessageTask = nil
+        if sleepMessageVisible {
+            withAnimation(.easeOut(duration: 0.4)) { sleepMessageVisible = false }
+        }
+    }
+
+    /// Drop the locked Saturn pose, seeding the orbit camera so the view does not jump. The sleep
+    /// timer and music keep running.
+    func releaseSleepFraming() {
+        guard viewer.sleepFraming else { return }
+        let st = Ephemeris.state(jd: viewer.clock.jd)
+        let pose = SleepFraming.pose(sun: st[.sun], saturn: st[.saturn])
+        let rel = Frames.eclToScene * (pose.position - st[.saturn])
+        let d = length(rel)
+        viewer.focus = .saturn
+        focus = .saturn
+        viewer.distanceKm = max(d, ViewerState.minDistance(.saturn))
+        if d > 1e-6 {
+            viewer.pitch = asin(max(-1, min(1, rel.y / d)))
+            viewer.yaw = atan2(rel.x, rel.z)
+        }
+        viewer.fly = nil
+        viewer.sleepFraming = false
+    }
+
+    private func presentSleepMessage(show: Bool, hold: Bool) {
+        sleepMessageTask?.cancel()
+        guard show else { sleepMessageVisible = false; return }
+        sleepMessageVisible = true
+        guard !hold else { return }
+        sleepMessageTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 10_000_000_000)
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeOut(duration: 0.8)) { sleepMessageVisible = false }
+        }
     }
 
     // MARK: Time
@@ -398,6 +477,12 @@ final class AppModel: ObservableObject {
             viewing = false
             AppLanguage.shared.code = "he"
             showSettings = true
+            return
+        case "sleep":
+            startSleepMode(showMessage: false)
+            return
+        case "sleepmsg":
+            startSleepMode(showMessage: true, holdMessage: true)
             return
         case "picker":
             showPicker = true

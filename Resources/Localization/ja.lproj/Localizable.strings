@@ -117,8 +117,10 @@
 "settings.trails" = "らせんの軌跡（銀河を進む）";
 "settings.version" = "バージョン";
 "sleep.minutes" = "%@分";
+"sleep.mode" = "睡眠";
 "sleep.off" = "オフ";
 "sleep.remaining" = "残り %@";
+"sleep.started" = "睡眠モードを始めました。30分後に音楽が止まり、画面が消えます。";
 "sleep.title" = "スリープタイマー";
 "speed.dayPerSec" = "1日/秒";
 "speed.decadePerSec" = "10年/秒";

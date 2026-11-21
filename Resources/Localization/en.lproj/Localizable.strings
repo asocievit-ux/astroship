@@ -117,8 +117,10 @@
 "settings.trails" = "Helix trails (galactic motion)";
 "settings.version" = "Version";
 "sleep.minutes" = "%@ min";
+"sleep.mode" = "Sleep";
 "sleep.off" = "Off";
 "sleep.remaining" = "Stops in %@";
+"sleep.started" = "Sleep mode started. In 30 minutes the music will stop and the screen will go to sleep.";
 "sleep.title" = "Sleep timer";
 "speed.dayPerSec" = "1 day/s";
 "speed.decadePerSec" = "10 years/s";

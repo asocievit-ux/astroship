@@ -56,6 +56,7 @@ struct SolarSceneView: UIViewRepresentable {
         @objc func pan(_ g: UIPanGestureRecognizer) {
             model.noteInteraction()
             if model.touring { model.endTour(); return }
+            model.releaseSleepFraming()
             let t = g.translation(in: g.view)
             g.setTranslation(.zero, in: g.view)
             let s = model.viewer
@@ -66,6 +67,7 @@ struct SolarSceneView: UIViewRepresentable {
         @objc func pinch(_ g: UIPinchGestureRecognizer) {
             model.noteInteraction()
             if model.touring { model.endTour(); return }
+            model.releaseSleepFraming()
             let s = model.viewer
             if g.state == .began { startDistance = s.distanceKm }
             guard g.scale > 0 else { return }
@@ -79,6 +81,7 @@ struct SolarSceneView: UIViewRepresentable {
             model.noteInteraction()
             if SleepTimer.shared.asleep { SleepTimer.shared.wake(); return }   // sleeping: a tap only wakes up
             if model.touring { model.endTour(); return }         // tour: a tap ends it, controls come back
+            if model.sleepMessageVisible { model.dismissSleepMessage() }
             if model.viewing { model.viewing = false; return }   // viewing mode: a tap only restores the controls
             guard let v = g.view as? SCNView else { return }
             let p = g.location(in: v)

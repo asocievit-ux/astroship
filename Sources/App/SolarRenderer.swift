@@ -462,16 +462,28 @@ final class SolarRenderer: NSObject, SCNSceneRendererDelegate {
         let sunRel = containers[BodyID.sun.rawValue].simdPosition
         sunLight.simdPosition = sunRel
 
-        // Camera orbiting the focus (at the origin).
-        let yaw = state.yaw, pitch = state.pitch
-        let dUnits = dist / Self.unitKm
-        let dir = SIMD3<Double>(cos(pitch) * sin(yaw), sin(pitch), cos(pitch) * cos(yaw))
-        let camPos = SIMD3<Float>(Float(dir.x * dUnits), Float(dir.y * dUnits), Float(dir.z * dUnits))
-        cameraNode.simdPosition = camPos
-        cameraNode.simdLook(at: .zero, up: SIMD3<Float>(0, 1, 0), localFront: SIMD3<Float>(0, 0, -1))
-        let focusBody = Catalog.body(state.fly?.to ?? state.focus)
-        let surface = max(dUnits - focusBody.radiusKm / Self.unitKm, focusBody.radiusKm / Self.unitKm * 0.05)
-        let zNear = max(surface * 0.05, 1e-5)
+        // Camera: sleep mode has its own Saturn-looking-inward pose; otherwise orbit the focus.
+        let camPos: SIMD3<Float>
+        let zNear: Double
+        if state.sleepFraming {
+            let pose = SleepFraming.pose(sun: st[.sun], saturn: st[.saturn])
+            camPos = (pose.position - focusKm).sceneUnits
+            let lookPos = (pose.lookAt - focusKm).sceneUnits
+            cameraNode.simdPosition = camPos
+            cameraNode.simdLook(at: lookPos, up: SIMD3<Float>(0, 1, 0), localFront: SIMD3<Float>(0, 0, -1))
+            let satPos = containers[BodyID.saturn.rawValue].simdPosition
+            zNear = max(Double(simd_length(satPos - camPos)) * 0.05, 1e-5)
+        } else {
+            let yaw = state.yaw, pitch = state.pitch
+            let dUnits = dist / Self.unitKm
+            let dir = SIMD3<Double>(cos(pitch) * sin(yaw), sin(pitch), cos(pitch) * cos(yaw))
+            camPos = SIMD3<Float>(Float(dir.x * dUnits), Float(dir.y * dUnits), Float(dir.z * dUnits))
+            cameraNode.simdPosition = camPos
+            cameraNode.simdLook(at: .zero, up: SIMD3<Float>(0, 1, 0), localFront: SIMD3<Float>(0, 0, -1))
+            let focusBody = Catalog.body(state.fly?.to ?? state.focus)
+            let surface = max(dUnits - focusBody.radiusKm / Self.unitKm, focusBody.radiusKm / Self.unitKm * 0.05)
+            zNear = max(surface * 0.05, 1e-5)
+        }
         cameraNode.camera?.zNear = zNear
         cameraNode.camera?.zFar = zNear * 1e10
         skyRoot.simdPosition = camPos

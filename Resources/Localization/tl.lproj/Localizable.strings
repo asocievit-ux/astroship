@@ -117,8 +117,10 @@
 "settings.trails" = "Bakas na helix (galaxy)";
 "settings.version" = "Bersyon";
 "sleep.minutes" = "%@ min";
+"sleep.mode" = "Tulog";
 "sleep.off" = "Off";
 "sleep.remaining" = "Hihinto sa %@";
+"sleep.started" = "Nagsimula na ang sleep mode. Sa loob ng 30 minuto, titigil ang musika at matutulog ang screen.";
 "sleep.title" = "Sleep timer";
 "speed.dayPerSec" = "1 araw/s";
 "speed.decadePerSec" = "10 taon/s";

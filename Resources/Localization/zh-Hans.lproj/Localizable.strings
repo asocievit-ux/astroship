@@ -117,8 +117,10 @@
 "settings.trails" = "螺旋轨迹（银河中前进）";
 "settings.version" = "版本";
 "sleep.minutes" = "%@分钟";
+"sleep.mode" = "睡眠";
 "sleep.off" = "关闭";
 "sleep.remaining" = "剩余 %@";
+"sleep.started" = "已开始睡眠模式。30 分钟后音乐会停止，屏幕将熄灭。";
 "sleep.title" = "睡眠定时器";
 "speed.dayPerSec" = "1天/秒";
 "speed.decadePerSec" = "10年/秒";

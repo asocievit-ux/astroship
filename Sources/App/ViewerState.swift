@@ -37,6 +37,7 @@ final class ViewerState: @unchecked Sendable {
 
     private var _yaw = 0.6, _pitch = 0.35, _distanceKm = 60_000.0
     private var _focus: BodyID = .earth
+    private var _sleepFraming = false
     private var _fly: FlyTransition?
     private var _mode: FrameMode = .heliocentric
     private var _options = DisplayOptions()
@@ -53,6 +54,8 @@ final class ViewerState: @unchecked Sendable {
     }
     var distanceKm: Double { get { locked { _distanceKm } } set { locked { _distanceKm = newValue } } }
     var focus: BodyID { get { locked { _focus } } set { locked { _focus = newValue } } }
+    /// Sleep mode: renderer places the camera near Saturn looking inward, every frame.
+    var sleepFraming: Bool { get { locked { _sleepFraming } } set { locked { _sleepFraming = newValue } } }
     var fly: FlyTransition? { get { locked { _fly } } set { locked { _fly = newValue } } }
     var mode: FrameMode { get { locked { _mode } } set { locked { _mode = newValue } } }
     var options: DisplayOptions { get { locked { _options } } set { locked { _options = newValue } } }

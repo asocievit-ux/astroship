@@ -117,8 +117,10 @@
 "settings.trails" = "שובלי סליל (מסע בגלקסיה)";
 "settings.version" = "גרסה";
 "sleep.minutes" = "%@ דק׳";
+"sleep.mode" = "שינה";
 "sleep.off" = "כבוי";
 "sleep.remaining" = "נעצר בעוד %@";
+"sleep.started" = "מצב שינה התחיל. בעוד 30 דקות המוזיקה תיעצר והמסך ייכבה.";
 "sleep.title" = "טיימר שינה";
 "speed.dayPerSec" = "יום/שנ׳";
 "speed.decadePerSec" = "עשור/שנ׳";

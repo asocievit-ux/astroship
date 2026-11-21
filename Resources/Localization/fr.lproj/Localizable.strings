@@ -117,8 +117,10 @@
 "settings.trails" = "Traînées en hélice (voyage galactique)";
 "settings.version" = "Version";
 "sleep.minutes" = "%@ min";
+"sleep.mode" = "Sommeil";
 "sleep.off" = "Désactivé";
 "sleep.remaining" = "Arrêt dans %@";
+"sleep.started" = "Le mode sommeil a commencé. Dans 30 minutes, la musique s’arrête et l’écran s’éteint.";
 "sleep.title" = "Minuterie de sommeil";
 "speed.dayPerSec" = "1 jour/s";
 "speed.decadePerSec" = "10 ans/s";
