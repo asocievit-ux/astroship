@@ -88,6 +88,16 @@ final class AppModel: ObservableObject {
         loadOptions()
         viewer.mode = mode
         viewer.options = options
+        dateText = Fmt.twoLineDate(AstroTime.date(julian: viewer.clock.jd))
+        // The date pill normally follows the renderer's snapshots; if none arrive (rendering paused,
+        // a slow first frame), keep it ticking from the clock so it is never blank.
+        dateTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, Date().timeIntervalSince(self.lastSnapshotAt) > 0.9 else { return }
+                self.dateText = Fmt.twoLineDate(AstroTime.date(julian: self.viewer.clock.jd))
+                self.isLive = self.viewer.clock.isLive
+            }
+        }
         let args = ProcessInfo.processInfo.arguments
         if let i = args.firstIndex(of: "-shot"), i + 1 < args.count {
             applyScreenshot(args[i + 1])
@@ -212,7 +222,11 @@ final class AppModel: ObservableObject {
 
     // MARK: Snapshot (main thread, ~4 Hz)
 
+    private var dateTimer: Timer?
+    private var lastSnapshotAt = Date.distantPast
+
     private func snapshot(_ st: EphemerisState) {
+        lastSnapshotAt = Date()
         dateText = Fmt.twoLineDate(AstroTime.date(julian: st.jd))
         isLive = viewer.clock.isLive
         let jd = st.jd

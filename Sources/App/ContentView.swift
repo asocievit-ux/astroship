@@ -17,12 +17,12 @@ struct ContentView: View {
                     if store.premiumNoticeVisible { PremiumBanner() }
                     Spacer()
                     if model.showInfo, let info = model.info { InfoCard(info: info) }
-                    TimeBar().fitWidth()
+                    TimeBar().fitWidth().padding(.horizontal, 4)   // a little more room near the bottom corners
                 }
                 // Inside the safe area, plus a margin that clears the rounded corners. The bars never
                 // overflow sideways: if their natural width does not fit (Display Zoom, SE, large text)
                 // they are scaled down as a whole instead of spilling past both edges.
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 22)
                 .padding(.bottom, 12)
                 .dynamicTypeSize(...DynamicTypeSize.xLarge)
                 .id(lang.code)
