@@ -13,14 +13,18 @@ struct ContentView: View {
                 .ignoresSafeArea()
             if !model.viewing {
                 VStack(spacing: 10) {
-                    TopBar()
+                    TopBar().fitWidth()
                     if store.premiumNoticeVisible { PremiumBanner() }
                     Spacer()
                     if model.showInfo, let info = model.info { InfoCard(info: info) }
-                    TimeBar()
+                    TimeBar().fitWidth()
                 }
-                .padding(.horizontal, 22)   // keep the bars well inside the rounded screen corners
+                // Inside the safe area, plus a margin that clears the rounded corners. The bars never
+                // overflow sideways: if their natural width does not fit (Display Zoom, SE, large text)
+                // they are scaled down as a whole instead of spilling past both edges.
+                .padding(.horizontal, 20)
                 .padding(.bottom, 12)
+                .dynamicTypeSize(...DynamicTypeSize.xLarge)
                 .id(lang.code)
                 .transition(.opacity)
             }
@@ -55,6 +59,40 @@ struct GlassCapsule: ViewModifier {
 }
 extension View { func glass() -> some View { modifier(GlassCapsule()) } }
 
+/// Lays a bar out at the full available width when its natural (minimum) width fits; otherwise
+/// shows it at its natural width scaled down to fit, so nothing is ever clipped by the screen edges.
+struct FitWidth: ViewModifier {
+    @State private var natural: CGFloat = 0
+    func body(content: Content) -> some View {
+        GeometryReader { geo in
+            let avail = geo.size.width
+            let needsScale = natural > avail + 0.5 && natural > 0
+            Group {
+                if needsScale {
+                    content.fixedSize()
+                        .scaleEffect(avail / natural, anchor: .center)
+                        .frame(width: avail, height: geo.size.height)
+                } else {
+                    content.frame(width: avail, height: geo.size.height)
+                }
+            }
+        }
+        .frame(height: max(natural > 0 ? measuredHeight : 0, 1))
+        .background(
+            content.fixedSize().hidden()
+                .background(GeometryReader { g in
+                    Color.clear
+                        .onAppear { natural = g.size.width; measuredHeight = g.size.height }
+                        .onChange(of: g.size) { _, v in natural = v.width; measuredHeight = v.height }
+                })
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        )
+    }
+    @State private var measuredHeight: CGFloat = 44
+}
+extension View { func fitWidth() -> some View { modifier(FitWidth()) } }
+
 struct TopBar: View {
     @EnvironmentObject var model: AppModel
 
@@ -70,7 +108,7 @@ struct TopBar: View {
                 Text(model.dateText.isEmpty ? " \n " : model.dateText)
                     .font(.caption.monospacedDigit()).foregroundStyle(.white)
                     .lineLimit(2).multilineTextAlignment(.leading)
-                    .fixedSize()
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.horizontal, 12).padding(.vertical, 6)
             .glass()

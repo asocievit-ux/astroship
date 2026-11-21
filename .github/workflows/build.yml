@@ -20,6 +20,14 @@ on:
         description: "iPhone simulator name regex"
         required: false
         default: "iPhone .*Pro$"
+      content_size:
+        description: "Simulator Dynamic Type (e.g. extra-extra-extra-large), empty = default"
+        required: false
+        default: ""
+      extra_iphones:
+        description: "Extra iPhone name regexes, comma separated (same shots, tagged by index)"
+        required: false
+        default: ""
       vision_shots:
         description: "Apple Vision Pro shots (empty = skip visionOS)"
         required: false
@@ -86,6 +94,7 @@ jobs:
             xcrun simctl bootstatus "$UDID" -b
             xcrun simctl install "$UDID" "$APP"
             xcrun simctl status_bar "$UDID" override --time "9:41" --batteryState charged --batteryLevel 100 || true
+            if [ -n "${{ inputs.content_size }}" ]; then xcrun simctl ui "$UDID" content_size "${{ inputs.content_size }}" || true; fi
             for ITEM in $LIST; do
               SHOT="${ITEM%%@*}"; LANGC="ja"; [ "$ITEM" != "$SHOT" ] && LANGC="${ITEM#*@}"
               xcrun simctl terminate "$UDID" com.aihasakuramoto22.solarmotion 2>/dev/null || true
@@ -99,6 +108,15 @@ jobs:
           IPHONE=$(pick '${{ inputs.iphone_re || 'iPhone .*Pro$' }}')
           [ -n "$IPHONE" ] || IPHONE=$(pick 'iPhone')
           shoot "$IPHONE" iphone "${{ inputs.shots || 'opening controls fast fasthelio tap picker controls@en' }}"
+          if [ -n "${{ inputs.extra_iphones }}" ]; then
+            IFS=',' read -ra EXTRA <<< "${{ inputs.extra_iphones }}"
+            for RE in "${EXTRA[@]}"; do
+              U=$(pick "$RE"); [ -n "$U" ] || { echo "no sim for $RE"; continue; }
+              TAG=$(echo "$RE" | tr -cd 'A-Za-z0-9')
+              shoot "$U" "$TAG" "${{ inputs.shots }}"
+            done
+          fi
+          xcrun simctl list devices available | grep -E "iPhone|iPad" | head -40
           if [ -n "${{ inputs.ipad_shots }}" ]; then
             IPAD=$(pick 'iPad Pro.*13')
             [ -n "$IPAD" ] || IPAD=$(pick 'iPad')
